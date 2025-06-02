@@ -1,7 +1,7 @@
-// src/contexts/AuthContext.jsx
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../services/firebaseConfig";
 import {
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
@@ -24,10 +24,25 @@ export const AuthProvider = ({ children }) => {
       setUser(currentUser);
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, []);
 
+  // регистрация нового пользователя
+  const register = async (email, password) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      setUser(userCredential.user);
+      setError("");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  // вход
   const login = async (email, password) => {
     try {
       const userCredential = await signInWithEmailAndPassword(
@@ -42,13 +57,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // выход
   const logout = async () => {
     await signOut(auth);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, error, loading }}>
+    <AuthContext.Provider
+      value={{ user, register, login, logout, error, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );

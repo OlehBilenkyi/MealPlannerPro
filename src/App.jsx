@@ -1,3 +1,4 @@
+// src/App.jsx
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -7,15 +8,16 @@ import {
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import PrivateRoute from "./routes/PrivateRoute";
+import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Meals from "./pages/Meals";
 import Stats from "./pages/Stats";
+import Profile from "./pages/Profile";
 
 /**
  * Основные маршруты приложения с приватными маршрутами
- * @returns {JSX.Element}
  */
 function AppRoutes() {
   const { user } = useAuth();
@@ -40,6 +42,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/meals/new"
+        element={
+          <PrivateRoute>
+            <Meals initialMode="new" />
+          </PrivateRoute>
+        }
+      />
+      <Route
         path="/meals"
         element={
           <PrivateRoute>
@@ -55,20 +65,29 @@ function AppRoutes() {
           </PrivateRoute>
         }
       />
+      <Route
+        path="/profile"
+        element={
+          <PrivateRoute>
+            <Profile />
+          </PrivateRoute>
+        }
+      />
+      {/* В случае незнакомого пути — перекидываем на Dashboard */}
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }
 
 /**
  * Главный компонент приложения с контекстом авторизации и роутером
- * @returns {JSX.Element}
  */
 export default function App() {
   return (
     <AuthProvider>
       <Router>
-        <div style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
-          <h1>Meal Planner Pro</h1>
+        <Navbar />
+        <div className="container">
           <AppRoutes />
         </div>
       </Router>

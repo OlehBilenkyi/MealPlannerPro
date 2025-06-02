@@ -1,79 +1,144 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { subscribeToUserMeals } from "../services/mealService";
+import { useMeals } from "../contexts/MealsContext";
+
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
 import { Pie } from "react-chartjs-2";
 
+ChartJS.register(ArcElement, Tooltip, Legend, Title);
+
 export default function Stats() {
-  const { currentUser } = useAuth();
-  const [stats, setStats] = useState({
-    daily: 0,
-    weekly: 0,
-    byType: {},
-  });
+  const { user } = useAuth();
+  const { meals } = useMeals();
+  const [todayCalories, setTodayCalories] = useState(0);
+  const [weekCalories, setWeekCalories] = useState(0);
+  const [dailyCount, setDailyCount] = useState(0);
+  const [byType, setByType] = useState({});
+  const [dailyGoal, setDailyGoal] = useState(2000);
 
   useEffect(() => {
-    if (!currentUser) return;
+    if (!user) return;
 
-    const unsubscribe = subscribeToUserMeals(currentUser.uid, (meals) => {
-      const today = new Date().toISOString().slice(0, 10);
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
 
-      const newStats = {
-        daily: 0,
-        weekly: 0,
-        byType: {},
-      };
+    let tCount = 0;
+    let tCal = 0;
+    let wCal = 0;
+    const typeMap = {};
 
-      meals.forEach((meal) => {
-        if (meal.date === today) {
-          newStats.daily += meal.totalCalories;
-        }
+    meals.forEach((meal) => {
+      const mealDate = meal.date.slice(0, 10);
+      const calories = meal.totalCalories;
 
-        const mealDate = new Date(meal.date);
-        if (mealDate >= weekAgo) {
-          newStats.weekly += meal.totalCalories;
-        }
-
-        if (!newStats.byType[meal.type]) {
-          newStats.byType[meal.type] = 0;
-        }
-        newStats.byType[meal.type] += meal.totalCalories;
-      });
-
-      setStats(newStats);
+      if (mealDate === todayStr) {
+        tCount += 1;
+        tCal += calories;
+      }
+      const mealDateObj = new Date(meal.date);
+      if (mealDateObj >= weekAgo) {
+        wCal += calories;
+      }
+      if (!typeMap[meal.type]) typeMap[meal.type] = 0;
+      typeMap[meal.type] += calories;
     });
 
-    return () => unsubscribe();
-  }, [currentUser]);
+    setDailyCount(tCount);
+    setTodayCalories(tCal);
+    setWeekCalories(wCal);
+    setByType(typeMap);
 
-  const chartData = {
-    labels: Object.keys(stats.byType),
+    const settingsRaw = localStorage.getItem(`userSettings_${user.uid}`);
+    if (settingsRaw) {
+      try {
+        const parsed = JSON.parse(settingsRaw);
+        if (!isNaN(Number(parsed.dailyCalorieGoal))) {
+          setDailyGoal(Number(parsed.dailyCalorieGoal));
+        }
+      } catch {}
+    }
+  }, [user, meals]);
+
+  const pieData = {
+    labels: Object.keys(byType),
     datasets: [
       {
-        data: Object.values(stats.byType),
-        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"],
+        data: Object.values(byType),
+        backgroundColor: [
+          "#FF6384",
+          "#36A2EB",
+          "#FFCE56",
+          "#4BC0C0",
+          "#9966FF",
+        ],
       },
     ],
   };
 
+  const pieOptions = {
+    plugins: {
+      title: {
+        display: true,
+        text: "Калории по типам приёма пищи за все время",
+        font: { size: 18 },
+      },
+      legend: {
+        position: "bottom",
+      },
+    },
+    maintainAspectRatio: false,
+  };
+
+  const progressPercent = Math.min(
+    100,
+    Math.round((todayCalories / dailyGoal) * 100)
+  );
+
   return (
-    <div className="stats">
-      <h2>Статистика</h2>
-      <div className="stat-cards">
-        <div className="stat-card">
-          <h3>Сегодня</h3>
-          <p>{stats.daily} ккал</p>
+    <div className="container">
+      <h2 className="heading">Статистика</h2>
+
+      <div className="stats-grid">
+        <div className="card">
+          <h3>Сегодняшние приёмы</h3>
+          <p>{dailyCount} шт.</p>
         </div>
-        <div className="stat-card">
-          <h3>За неделю</h3>
-          <p>{stats.weekly} ккал</p>
+        <div className="card">
+          <h3>Калории сегодня</h3>
+          <p>
+            {todayCalories} / {dailyGoal} ккал
+          </p>
+          <div className="progress-wrapper">
+            <div
+              className="progress-fill"
+              style={{
+                width: `${progressPercent}%`,
+                backgroundColor:
+                  progressPercent > 100
+                    ? "var(--color-danger)"
+                    : "var(--color-success)",
+              }}
+            />
+          </div>
+          <small>{progressPercent}% от цели</small>
+        </div>
+        <div className="card">
+          <h3>Калории за 7 дней</h3>
+          <p>{weekCalories} ккал</p>
         </div>
       </div>
 
-      <h3>По типам приёмов пищи</h3>
-      <div style={{ width: "400px", height: "400px" }}>
-        <Pie data={chartData} />
+      <h3 style={{ marginTop: "24px" }}>По типам приёмов пищи</h3>
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "400px",
+          height: "400px",
+          marginTop: "16px",
+        }}
+      >
+        <Pie data={pieData} options={pieOptions} />
       </div>
     </div>
   );

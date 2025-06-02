@@ -1,12 +1,8 @@
+// src/routes/PrivateRoute.jsx
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
-/**
- * Защищённый маршрут — рендерит детей если есть user, иначе редирект на /login
- * @param {{children: React.ReactNode}} props
- * @returns {JSX.Element}
- */
 export default function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
 
@@ -18,10 +14,10 @@ export default function PrivateRoute({ children }) {
           justifyContent: "center",
           alignItems: "center",
           height: "100vh",
-          fontSize: 18,
+          fontSize: "1.25rem",
         }}
       >
-        Загрузка...
+        Загрузка…
       </div>
     );
   }

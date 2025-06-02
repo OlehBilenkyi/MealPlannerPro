@@ -1,35 +1,250 @@
-#root {
-  max-width: 1280px;
+/* ==== Общие переменные ==== */
+:root {
+  --color-primary: #007bff;
+  --color-primary-hover: #0056b3;
+  --color-success: #28a745;
+  --color-warning: #ffc107;
+  --color-danger: #dc3545;
+  --color-dark: #343a40;
+  --color-light: #f8f9fa;
+  --color-white: #fff;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --border-radius: 6px;
+  --box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ==== Сброс и базовые стили ==== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--color-light);
+  color: var(--color-dark);
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ==== Навигационная шапка ==== */
+.navbar {
+  background-color: var(--color-primary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--color-white);
+}
+.navbar .logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+.navbar .nav-links a {
+  margin-left: var(--spacing-lg);
+  color: var(--color-white);
+  font-size: 1rem;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius);
+  transition: background-color 0.2s;
+}
+.navbar .nav-links a.active,
+.navbar .nav-links a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ==== Общий контейнер страницы ==== */
+.container {
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: var(--spacing-lg);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* ==== Заголовки ==== */
+.heading {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-lg);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+/* ==== ActionBar (панель действий) ==== */
+.actions-bar {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-md);
+  align-items: center;
+}
+
+/* ==== Кнопки ==== */
+.btn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+.btn-success {
+  background-color: var(--color-success);
+  color: var(--color-white);
+}
+.btn-warning {
+  background-color: var(--color-warning);
+  color: var(--color-dark);
+}
+.btn-danger {
+  background-color: var(--color-danger);
+  color: var(--color-white);
+}
+.btn-secondary {
+  background-color: var(--color-dark);
+  color: var(--color-white);
+}
+
+/* ==== Фильтры ==== */
+.filters {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: var(--spacing-md);
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+.filter-heading {
+  width: 100%;
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-sm);
+}
+.form-label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+.form-input,
+.form-select {
+  margin-top: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+}
+.form-error {
+  margin-top: var(--spacing-xs);
+  font-size: 0.85rem;
+  color: var(--color-danger);
+}
+
+/* ==== Форма добавления/редактирования ==== */
+.form-container {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+.food-item {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+/* ==== Таблица ==== */
+.table-container {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  overflow-x: auto;
+}
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table-container th,
+.table-container td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+.table-container th {
+  background-color: #f1f1f1;
+  font-weight: 600;
+}
+.table-container tr:hover {
+  background-color: #fafafa;
+}
+
+/* ==== Карточки статистики ==== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--spacing-lg);
+}
+.card {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: var(--spacing-md);
+}
+.card h3 {
+  margin-bottom: var(--spacing-sm);
+  font-size: 1.25rem;
+}
+.card p {
+  font-size: 1rem;
+  color: var(--color-dark);
+}
+.progress-wrapper {
+  margin-top: var(--spacing-xs);
+  background-color: #e9ecef;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  height: 10px;
+}
+.progress-fill {
+  height: 100%;
+  transition: width 0.3s;
+}
+/* ==== Стили для страницы Profile ==== */
+.profile-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+.profile-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+}
+.profile-form .full-width {
+  grid-column: 1 / -1;
+}
+
+/* ==== Адаптивные правки ==== */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
-  to {
-    transform: rotate(360deg);
+  .filters {
+    flex-direction: column;
+  }
+  .actions-bar {
+    flex-direction: column;
   }
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-

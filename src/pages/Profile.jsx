@@ -1,0 +1,198 @@
+// src/pages/Profile.jsx
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { updateProfile, updatePassword } from "firebase/auth";
+import { auth } from "../services/firebaseConfig";
+
+export default function Profile() {
+  const { user, logout } = useAuth();
+  const uid = user?.uid;
+
+  const [displayName, setDisplayName] = useState("");
+  const [dailyCalorieGoal, setDailyCalorieGoal] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const storageKey = `userSettings_${uid}`;
+
+  useEffect(() => {
+    if (!uid) return;
+
+    const raw = localStorage.getItem(storageKey);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        setDisplayName(parsed.displayName || user.displayName || "");
+        setDailyCalorieGoal(parsed.dailyCalorieGoal?.toString() || "2000");
+      } catch {
+        const defaults = {
+          displayName: user.displayName || "",
+          dailyCalorieGoal: 2000,
+        };
+        localStorage.setItem(storageKey, JSON.stringify(defaults));
+        setDisplayName(defaults.displayName);
+        setDailyCalorieGoal("2000");
+      }
+    } else {
+      const defaults = {
+        displayName: user.displayName || "",
+        dailyCalorieGoal: 2000,
+      };
+      localStorage.setItem(storageKey, JSON.stringify(defaults));
+      setDisplayName(defaults.displayName);
+      setDailyCalorieGoal("2000");
+    }
+
+    setLoading(false);
+  }, [uid, user.displayName]);
+
+  if (!user) return <p>Загрузка...</p>;
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    // Смена пароля (если введены оба поля)
+    if (newPassword || confirmPassword) {
+      if (newPassword !== confirmPassword) {
+        setMessage("Пароли не совпадают.");
+        return;
+      }
+      if (newPassword.length < 6) {
+        setMessage("Пароль должен быть минимум 6 символов.");
+        return;
+      }
+      try {
+        await updatePassword(auth.currentUser, newPassword);
+        setMessage("Пароль успешно изменён.");
+      } catch (err) {
+        console.error(err);
+        setMessage("Не удалось сменить пароль: " + err.message);
+        return;
+      }
+    }
+
+    // Смена displayName (если изменилось)
+    if (displayName !== user.displayName) {
+      try {
+        await updateProfile(auth.currentUser, { displayName });
+      } catch (err) {
+        console.error(err);
+        setMessage("Не удалось обновить имя: " + err.message);
+        return;
+      }
+    }
+
+    // Сохранение цели по калориям в localStorage
+    try {
+      const goalNumber = parseInt(dailyCalorieGoal, 10);
+      if (isNaN(goalNumber) || goalNumber < 0) {
+        setMessage("Целевая калорийность должна быть неотрицательным числом.");
+        return;
+      }
+      const settingsToSave = { displayName, dailyCalorieGoal: goalNumber };
+      localStorage.setItem(storageKey, JSON.stringify(settingsToSave));
+      setMessage("Настройки сохранены.");
+    } catch (err) {
+      console.error(err);
+      setMessage("Не удалось сохранить настройки: " + err.message);
+    }
+  };
+
+  return (
+    <div className="container">
+      <h2 className="heading">Профиль пользователя</h2>
+
+      {loading ? (
+        <p>Загрузка...</p>
+      ) : (
+        <form onSubmit={handleSave}>
+          {/* === Сеточный контейнер: 3 колонки === */}
+          <div className="profile-form">
+            <label>
+              Email:
+              <input
+                className="form-input"
+                type="email"
+                value={user.email}
+                disabled
+              />
+            </label>
+
+            <label>
+              Имя для отображения:
+              <input
+                className="form-input"
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                required
+              />
+            </label>
+
+            <label>
+              Целевая калорийность (ккал/день):
+              <input
+                className="form-input"
+                type="number"
+                value={dailyCalorieGoal}
+                onChange={(e) => setDailyCalorieGoal(e.target.value)}
+                required
+                min={0}
+              />
+            </label>
+
+            {/* Поля пароля, занимающие всю ширину (2 колонки) */}
+            <label className="full-width">
+              Новый пароль:
+              <input
+                className="form-input"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Оставьте пустым, чтобы не менять"
+              />
+            </label>
+
+            <label className="full-width">
+              Подтверждение нового пароля:
+              <input
+                className="form-input"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Повторите новый пароль"
+              />
+            </label>
+          </div>
+
+          {/* Сообщение об ошибке/успехе */}
+          {message && (
+            <p
+              style={{
+                color: message.startsWith("Не удалось") ? "red" : "green",
+                marginBottom: "1rem",
+              }}
+            >
+              {message}
+            </p>
+          )}
+
+          <button className="btn btn-primary" type="submit">
+            Сохранить изменения
+          </button>
+        </form>
+      )}
+
+      <button
+        className="btn btn-danger"
+        onClick={logout}
+        style={{ marginTop: "20px" }}
+      >
+        Выйти
+      </button>
+    </div>
+  );
+}

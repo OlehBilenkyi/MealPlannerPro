@@ -1,29 +1,30 @@
+// src/MealManager/MealManager.jsx
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { addMeal } from "../services/mealService";
-import AddMealForm from "./AddMealForm";
+import { addMeal, subscribeToUserMeals } from "../services/mealService";
+import AddMealForm from "../components/AddMealForm";
 
 const MealManager = () => {
-  const { currentUser } = useAuth();
+  const { user } = useAuth();
   const [meals, setMeals] = useState([]);
 
   useEffect(() => {
-    if (!currentUser) return;
+    if (!user) return;
 
-    const unsubscribe = subscribeToUserMeals(currentUser.uid, (meals) => {
+    const unsubscribe = subscribeToUserMeals(user.uid, (meals) => {
       setMeals(meals);
     });
 
     return () => unsubscribe();
-  }, [currentUser]);
+  }, [user]);
 
   const handleAddMeal = async (mealData) => {
-    if (!currentUser || mealData.foods.length === 0) return;
+    if (!user || mealData.foods.length === 0) return;
 
     try {
       await addMeal({
         ...mealData,
-        userId: currentUser.uid,
+        userId: user.uid,
         totalCalories: mealData.foods.reduce(
           (sum, food) => sum + food.calories * food.quantity,
           0

@@ -1,42 +1,103 @@
-  export const mealTypes = ["breakfast", "lunch", "dinner", "snack"];
+// src/services/mealService.js
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
+import { db } from "./firebaseConfig";
 
-  const STORAGE_KEY = "meals";
+export const mealTypes = ["breakfast", "lunch", "dinner", "snack"];
 
-  export const getUserMeals = async (userId) => {
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    return data.filter((meal) => meal.userId === userId);
-  };
+/**
+ * Добавляет новый приём пищи в Firestore.
+ * @param {{ userId: string, date: string, type: string, foods: Array<{name:string,calories:number,quantity:number}>, totalCalories: number }} meal
+ * @returns {Promise<string>} возвращает автоматически сгенерированный id документа
+ */
+export const addMeal = async (meal) => {
+  // коллекция "meals"
+  const mealsRef = collection(db, "meals");
+  // addDoc возвращает DocumentReference, у него есть .id
+  const docRef = await addDoc(mealsRef, {
+    userId: meal.userId,
+    date: meal.date,
+    type: meal.type,
+    foods: meal.foods,
+    totalCalories: meal.totalCalories,
+    createdAt: new Date(), // можно хранить время создания
+  });
+  return docRef.id;
+};
 
-  export const addMeal = async (meal) => {
-    const existing = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    const newMeal = { id: Date.now().toString(), ...meal };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([...existing, newMeal]));
-    return newMeal;
-  };
+/**
+ * Удаляет приём пищи с указанным id (удаляется документ из Firestore).
+ * @param {string} mealId
+ * @returns {Promise<void>}
+ */
+export const deleteMeal = async (mealId) => {
+  const mealDocRef = doc(db, "meals", mealId);
+  await deleteDoc(mealDocRef);
+};
 
-  export const deleteMeal = async (mealId) => {
-    const existing = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    const updated = existing.filter((meal) => meal.id !== mealId);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-  };
+/**
+ * Обновляет приём пищи с указанным id.
+ * @param {string} mealId
+ * @param {{ userId: string, date: string, type: string, foods: Array<{name:string,calories:number,quantity:number}>, totalCalories: number }} updatedData
+ * @returns {Promise<void>}
+ */
+export const updateMeal = async (mealId, updatedData) => {
+  const mealDocRef = doc(db, "meals", mealId);
+  await updateDoc(mealDocRef, {
+    date: updatedData.date,
+    type: updatedData.type,
+    foods: updatedData.foods,
+    totalCalories: updatedData.totalCalories,
+    userId: updatedData.userId,
+    updatedAt: new Date(),
+  });
+};
 
-  export const updateMeal = async (mealId, updatedData) => {
-    const existing = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    const updatedMeals = existing.map((meal) =>
-      meal.id === mealId ? { ...meal, ...updatedData } : meal
-    );
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedMeals));
-  };
+/**
+ * Возвращает все приёмы пищи для заданного userId (одноразово, без подписки).
+ * Можно использовать, если нужно получить единоразовый снэпшот.
+ * @param {string} userId
+ * @returns {Promise<Array<Object>>} массив объектов {id, userId, date, type, foods, totalCalories}
+ */
+export const getUserMeals = async (userId) => {
+  const mealsRef = collection(db, "meals");
+  const q = query(mealsRef, where("userId", "==", userId));
+  const snapshot = await getDocs(q);
+  const meals = [];
+  snapshot.forEach((docSnap) => {
+    meals.push({ id: docSnap.id, ...docSnap.data() });
+  });
+  return meals;
+};
 
-  export const subscribeToUserMeals = (userId, callback) => {
-    const loadData = () => {
-      const allMeals = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      const userMeals = allMeals.filter((m) => m.userId === userId);
-      callback(userMeals);
-    };
+/**
+ * Подписывается на изменения в коллекции "meals" для конкретного userId.
+ * Всюкий раз, когда добавляется/обновляется/удаляется документ, вызывается callback(mealsArray).
+ * @param {string} userId
+ * @param {(meals: Array<Object>) => void} callback
+ * @returns {() => void} функцию, которую нужно вызвать для отписки
+ */
+export const subscribeToUserMeals = (userId, callback) => {
+  const mealsRef = collection(db, "meals");
+  const q = query(mealsRef, where("userId", "==", userId));
 
-    loadData();
+  // onSnapshot возвращает функцию unsubscribe
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const meals = [];
+    querySnapshot.forEach((docSnap) => {
+      meals.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    callback(meals);
+  });
 
-    const interval = setInterval(loadData, 1000);
-    return () => clearInterval(interval);
-  };
+  return unsubscribe;
+};
