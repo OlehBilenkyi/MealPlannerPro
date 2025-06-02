@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { mealTypes } from "../services/mealService";
+import styles from "./AddMealForm.module.css";
 
 /**
  * @typedef {Object} FoodItem
@@ -22,98 +23,67 @@ const getInitialMealState = (meal) => ({
   date: meal?.date || new Date().toISOString().slice(0, 10),
 });
 
+/**
+ * @param {{
+ *   index: number,
+ *   food: FoodItem,
+ *   errors: { name: string, calories: string },
+ *   onChange: (index: number, field: string, value: any) => void,
+ *   onRemove: (index: number) => void,
+ *   showRemove: boolean
+ * }} props
+ */
+function FoodItemInput({ index, food, errors, onChange, onRemove, showRemove }) {
+  return (
+    <div className={styles.foodItem}>
+      <div className={styles.foodItemRow}>
+        <input
+          className={styles.foodInput}
+          placeholder="Название"
+          value={food.name}
+          onChange={(e) => onChange(index, "name", e.target.value)}
+        />
+        {errors?.name && <span className={styles.error}>{errors.name}</span>}
+      </div>
+
+      <div className={styles.foodItemRow}>
+        <input
+          className={styles.foodInput}
+          type="number"
+          placeholder="Калории"
+          value={food.calories}
+          onChange={(e) => onChange(index, "calories", e.target.value)}
+        />
+        {errors?.calories && (
+          <span className={styles.error}>{errors.calories}</span>
+        )}
+      </div>
+
+      <div className={styles.foodItemRow}>
+        <input
+          className={styles.foodInput}
+          type="number"
+          placeholder="Количество"
+          value={food.quantity}
+          onChange={(e) => onChange(index, "quantity", e.target.value)}
+        />
+        {showRemove && (
+          <button
+            type="button"
+            className={styles.removeButton}
+            onClick={() => onRemove(index)}
+          >
+            Удалить
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function AddMealForm({ onAdd, meal, onUpdate }) {
   const [newMeal, setNewMeal] = useState(getInitialMealState(meal));
   const [errors, setErrors] = useState({ date: "", foods: [] });
-
-  const styles = {
-    form: {
-      maxWidth: "600px",
-      margin: "0 auto",
-      padding: "20px",
-      fontFamily: "Arial, sans-serif",
-      backgroundColor: "#f9f9f9",
-      borderRadius: "8px",
-      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-    },
-    heading: {
-      color: "#333",
-      fontSize: "24px",
-      marginBottom: "20px",
-      textAlign: "center",
-    },
-    label: {
-      display: "block",
-      marginBottom: "8px",
-      fontWeight: "bold",
-    },
-    input: {
-      width: "100%",
-      padding: "8px",
-      marginBottom: "10px",
-      borderRadius: "4px",
-      border: "1px solid #ccc",
-    },
-    select: {
-      width: "100%",
-      padding: "8px",
-      marginBottom: "10px",
-      borderRadius: "4px",
-      border: "1px solid #ccc",
-    },
-    foodItem: {
-      display: "flex",
-      flexDirection: "column",
-      marginBottom: "15px",
-      padding: "10px",
-      backgroundColor: "#fff",
-      borderRadius: "4px",
-      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-    },
-    foodItemRow: {
-      display: "flex",
-      alignItems: "center",
-      marginBottom: "5px",
-    },
-    foodInput: {
-      flex: 1,
-      padding: "8px",
-      marginRight: "5px",
-      borderRadius: "4px",
-      border: "1px solid #ccc",
-    },
-    error: {
-      color: "red",
-      fontSize: "12px",
-      marginTop: "-8px",
-      marginBottom: "10px",
-    },
-    button: {
-      padding: "10px 15px",
-      backgroundColor: "#007bff",
-      color: "#fff",
-      border: "none",
-      borderRadius: "4px",
-      cursor: "pointer",
-      marginRight: "10px",
-      marginTop: "10px",
-    },
-    buttonHover: {
-      backgroundColor: "#0056b3",
-    },
-    removeButton: {
-      backgroundColor: "#dc3545",
-      color: "#fff",
-      border: "none",
-      borderRadius: "4px",
-      cursor: "pointer",
-      padding: "5px 10px",
-      marginLeft: "10px",
-    },
-    removeButtonHover: {
-      backgroundColor: "#c82333",
-    },
-  };
 
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -183,30 +153,30 @@ export default function AddMealForm({ onAdd, meal, onUpdate }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={styles.form}>
-      <h3 style={styles.heading}>
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <h3 className={styles.heading}>
         {meal ? "Редактировать приём пищи" : "Добавить приём пищи"}
       </h3>
 
       <div>
-        <label style={styles.label}>
+        <label className={styles.label}>
           Дата:
           <input
-            style={styles.input}
+            className={styles.input}
             type="date"
             name="date"
             value={newMeal.date}
             onChange={handleInputChange}
           />
-          {errors.date && <span style={styles.error}>{errors.date}</span>}
+          {errors.date && <span className={styles.error}>{errors.date}</span>}
         </label>
       </div>
 
       <div>
-        <label style={styles.label}>
+        <label className={styles.label}>
           Тип:
           <select
-            style={styles.select}
+            className={styles.select}
             name="type"
             value={newMeal.type}
             onChange={handleInputChange}
@@ -221,76 +191,20 @@ export default function AddMealForm({ onAdd, meal, onUpdate }) {
       </div>
 
       {newMeal.foods.map((food, index) => (
-        <div key={index} style={styles.foodItem}>
-          <div style={styles.foodItemRow}>
-            <input
-              style={styles.foodInput}
-              placeholder="Название"
-              value={food.name}
-              onChange={(e) => handleFoodChange(index, "name", e.target.value)}
-            />
-            {errors.foods[index]?.name && (
-              <span style={styles.error}>{errors.foods[index].name}</span>
-            )}
-          </div>
-
-          <div style={styles.foodItemRow}>
-            <input
-              style={styles.foodInput}
-              type="number"
-              placeholder="Калории"
-              value={food.calories}
-              onChange={(e) =>
-                handleFoodChange(index, "calories", e.target.value)
-              }
-            />
-            {errors.foods[index]?.calories && (
-              <span style={styles.error}>{errors.foods[index].calories}</span>
-            )}
-          </div>
-
-          <div style={styles.foodItemRow}>
-            <input
-              style={styles.foodInput}
-              type="number"
-              placeholder="Количество"
-              value={food.quantity}
-              onChange={(e) =>
-                handleFoodChange(index, "quantity", e.target.value)
-              }
-            />
-            {newMeal.foods.length > 1 && (
-              <button
-                type="button"
-                style={styles.removeButton}
-                onMouseOver={(e) =>
-                  (e.currentTarget.style.backgroundColor =
-                    styles.removeButtonHover.backgroundColor)
-                }
-                onMouseOut={(e) =>
-                  (e.currentTarget.style.backgroundColor =
-                    styles.removeButton.backgroundColor)
-                }
-                onClick={() => removeFood(index)}
-              >
-                🗑
-              </button>
-            )}
-          </div>
-        </div>
+        <FoodItemInput
+          key={index}
+          index={index}
+          food={food}
+          errors={errors.foods[index]}
+          onChange={handleFoodChange}
+          onRemove={removeFood}
+          showRemove={newMeal.foods.length > 1}
+        />
       ))}
 
       <button
         type="button"
-        style={styles.button}
-        onMouseOver={(e) =>
-          (e.currentTarget.style.backgroundColor =
-            styles.buttonHover.backgroundColor)
-        }
-        onMouseOut={(e) =>
-          (e.currentTarget.style.backgroundColor =
-            styles.button.backgroundColor)
-        }
+        className={styles.button}
         onClick={addFood}
       >
         + Добавить продукт
@@ -298,9 +212,7 @@ export default function AddMealForm({ onAdd, meal, onUpdate }) {
 
       <button
         type="submit"
-        style={{ ...styles.button, backgroundColor: "#28a745" }}
-        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#218838")}
-        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#28a745")}
+        className={`${styles.button} ${styles.submitButton}`}
       >
         {meal ? "Обновить приём пищи" : "Сохранить приём пищи"}
       </button>

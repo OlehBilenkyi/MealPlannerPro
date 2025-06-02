@@ -109,9 +109,13 @@ export default function Meals() {
   // Фильтрация приёмов пищи
   useEffect(() => {
     const filtered = meals.filter((meal) => {
+      const mealDate = meal.date ? meal.date.slice(0, 10) : "";
+      const mealType = meal.type ? meal.type.trim().toLowerCase() : "";
+      const filterType = filters.type.trim().toLowerCase();
+
       return (
-        (!filters.date || meal.date === filters.date) &&
-        (!filters.type || meal.type === filters.type)
+        (!filters.date || mealDate === filters.date) &&
+        (!filters.type || mealType === filterType)
       );
     });
     setFilteredMeals(filtered);

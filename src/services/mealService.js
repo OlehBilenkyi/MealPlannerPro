@@ -1,107 +1,42 @@
-import { db } from "./firebaseConfig";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  query,
-  where,
-  onSnapshot,
-  doc,
-  updateDoc,
-  deleteDoc,
-} from "firebase/firestore";
+export const mealTypes = ["breakfast", "lunch", "dinner", "snack"];
 
-/** @typedef {import('./meal').Meal} Meal */
+const STORAGE_KEY = "meals";
 
-// Коллекция "meals"
-const mealsCollection = collection(db, "meals");
+export const getUserMeals = async (userId) => {
+  const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  return data.filter((meal) => meal.userId === userId);
+};
 
-/**
- * Считает суммарные калории по списку продуктов
- * @param {Array<{calories:number, quantity:number}>} foods
- * @returns {number}
- */
-const calculateTotalCalories = (foods) =>
-  foods.reduce((sum, food) => sum + food.calories * food.quantity, 0);
+export const addMeal = async (meal) => {
+  const existing = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  const newMeal = { id: Date.now().toString(), ...meal };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...existing, newMeal]));
+  return newMeal;
+};
 
-/**
- * Добавляет приём пищи в Firestore с подсчётом калорий
- * @param {Meal} meal
- * @returns {Promise<Meal & {id: string}>}
- */
-export async function addMeal(meal) {
-  const mealWithTotal = {
-    ...meal,
-    totalCalories: calculateTotalCalories(meal.foods),
+export const deleteMeal = async (mealId) => {
+  const existing = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  const updated = existing.filter((meal) => meal.id !== mealId);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+};
+
+export const updateMeal = async (mealId, updatedData) => {
+  const existing = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  const updatedMeals = existing.map((meal) =>
+    meal.id === mealId ? { ...meal, ...updatedData } : meal
+  );
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedMeals));
+};
+
+export const subscribeToUserMeals = (userId, callback) => {
+  const loadData = () => {
+    const allMeals = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    const userMeals = allMeals.filter((m) => m.userId === userId);
+    callback(userMeals);
   };
 
-  const docRef = await addDoc(mealsCollection, mealWithTotal);
-  return { id: docRef.id, ...mealWithTotal };
-}
+  loadData();
 
-/**
- * Получает все приёмы пищи пользователя
- * @param {string} userId
- * @returns {Promise<Meal[]>}
- */
-export async function getMealsByUser(userId) {
-  const q = query(mealsCollection, where("userId", "==", userId));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-}
-
-/**
- * Получает приёмы пищи пользователя по дате
- * @param {string} userId
- * @param {string} date - формат 'YYYY-MM-DD'
- * @returns {Promise<Meal[]>}
- */
-export async function getMealsByDate(userId, date) {
-  const q = query(
-    mealsCollection,
-    where("userId", "==", userId),
-    where("date", "==", date)
-  );
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-}
-
-/**
- * Подписка на изменения в приёмах пищи пользователя (реактивный паттерн)
- * @param {string} userId
- * @param {(meals: Meal[]) => void} callback
- * @returns {() => void} Функция отписки
- */
-export function subscribeToUserMeals(userId, callback) {
-  const q = query(mealsCollection, where("userId", "==", userId));
-  return onSnapshot(q, (snapshot) => {
-    const meals = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    callback(meals);
-  });
-}
-
-/**
- * Обновляет приём пищи по ID с подсчётом калорий
- * @param {string} mealId
- * @param {Partial<Meal>} updatedData
- * @returns {Promise<void>}
- */
-export async function updateMeal(mealId, updatedData) {
-  const mealRef = doc(db, "meals", mealId);
-  await updateDoc(mealRef, {
-    ...updatedData,
-    totalCalories: calculateTotalCalories(updatedData.foods || []),
-  });
-}
-
-/**
- * Удаляет приём пищи по ID
- * @param {string} mealId
- * @returns {Promise<void>}
- */
-export async function deleteMeal(mealId) {
-  await deleteDoc(doc(db, "meals", mealId));
-}
-
-/** Типы приёмов пищи */
-export const mealTypes = ["breakfast", "lunch", "dinner", "snack"];
+  const interval = setInterval(loadData, 1000);
+  return () => clearInterval(interval);
+};

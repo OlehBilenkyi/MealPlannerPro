@@ -1,157 +1,59 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { addMeal, getMealTypes } from "../services/mealService";
+import { addMeal } from "../services/mealService";
+import AddMealForm from "./AddMealForm";
 
 const MealManager = () => {
   const { currentUser } = useAuth();
   const [meals, setMeals] = useState([]);
-  const [newMeal, setNewMeal] = useState({
-    date: new Date().toISOString().split("T")[0],
-    type: "breakfast",
-    foods: [],
-    totalCalories: 0,
-  });
-  const [currentFood, setCurrentFood] = useState({
-    name: "",
-    calories: 0,
-    quantity: 1,
-  });
 
   useEffect(() => {
     if (!currentUser) return;
 
     const unsubscribe = subscribeToUserMeals(currentUser.uid, (meals) => {
-      // При желании можно отфильтровать по дате newMeal.date,
-      // но можно просто показывать все приёмы пищи пользователя
       setMeals(meals);
     });
 
     return () => unsubscribe();
   }, [currentUser]);
 
-  const addFoodToMeal = () => {
-    if (!currentFood.name || currentFood.calories <= 0) return;
-
-    const updatedFoods = [...newMeal.foods, currentFood];
-    const updatedCalories = updatedFoods.reduce(
-      (sum, food) => sum + food.calories * food.quantity,
-      0
-    );
-
-    setNewMeal({
-      ...newMeal,
-      foods: updatedFoods,
-      totalCalories: updatedCalories,
-    });
-
-    setCurrentFood({ name: "", calories: 0, quantity: 1 });
-  };
-
-  const saveMeal = async () => {
-    if (!currentUser || newMeal.foods.length === 0) return;
+  const handleAddMeal = async (mealData) => {
+    if (!currentUser || mealData.foods.length === 0) return;
 
     try {
       await addMeal({
+        ...mealData,
         userId: currentUser.uid,
-        date: newMeal.date,
-        type: newMeal.type,
-        foods: newMeal.foods,
-        totalCalories: newMeal.totalCalories,
-      });
-
-      setNewMeal({
-        ...newMeal,
-        foods: [],
-        totalCalories: 0,
+        totalCalories: mealData.foods.reduce(
+          (sum, food) => sum + food.calories * food.quantity,
+          0
+        ),
       });
     } catch (error) {
-      console.error("Error adding meal: ", error);
+      console.error("Ошибка при добавлении приёма пищи:", error);
     }
   };
 
   return (
     <div className="meal-manager">
-      <h2>Управление приемами пищи</h2>
+      <h2>Управление приёмами пищи</h2>
 
-      <div className="date-selector">
-        <label>Дата: </label>
-        <input
-          type="date"
-          value={newMeal.date}
-          onChange={(e) => setNewMeal({ ...newMeal, date: e.target.value })}
-        />
-      </div>
+      {/* 🔽 Форма добавления */}
+      <AddMealForm onAdd={handleAddMeal} />
 
-      <div className="meal-type">
-        <label>Тип приема пищи: </label>
-        <select
-          value={newMeal.type}
-          onChange={(e) => setNewMeal({ ...newMeal, type: e.target.value })}
-        >
-          {getMealTypes().map((type) => (
-            <option key={type} value={type}>
-              {type}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="food-input">
-        <h3>Добавить продукт:</h3>
-        <input
-          type="text"
-          placeholder="Название"
-          value={currentFood.name}
-          onChange={(e) =>
-            setCurrentFood({ ...currentFood, name: e.target.value })
-          }
-        />
-        <input
-          type="number"
-          placeholder="Калории"
-          value={currentFood.calories}
-          onChange={(e) =>
-            setCurrentFood({ ...currentFood, calories: Number(e.target.value) })
-          }
-        />
-        <input
-          type="number"
-          placeholder="Количество"
-          value={currentFood.quantity}
-          onChange={(e) =>
-            setCurrentFood({ ...currentFood, quantity: Number(e.target.value) })
-          }
-          min="1"
-        />
-        <button onClick={addFoodToMeal}>Добавить продукт</button>
-      </div>
-
-      <div className="current-meal">
-        <h3>Текущий прием пищи ({newMeal.type}):</h3>
-        <ul>
-          {newMeal.foods.map((food, index) => (
-            <li key={index}>
-              {food.quantity}x {food.name} - {food.calories * food.quantity}{" "}
-              ккал
-            </li>
-          ))}
-        </ul>
-        <p>Всего калорий: {newMeal.totalCalories}</p>
-        <button onClick={saveMeal}>Сохранить прием пищи</button>
-      </div>
-
+      {/* 🔽 Список сохранённых приёмов пищи */}
       <div className="meals-list">
-        <h3>Сохраненные приемы пищи:</h3>
+        <h3>Сохранённые приёмы пищи:</h3>
         {meals.map((meal) => (
           <div key={meal.id} className="meal-item">
             <h4>
-              {meal.type} ({meal.date})
+              {meal.type} — {meal.date}
             </h4>
-            <p>Всего калорий: {meal.totalCalories}</p>
+            <p>Калории: {meal.totalCalories}</p>
             <ul>
               {meal.foods.map((food, index) => (
                 <li key={index}>
-                  {food.quantity}x {food.name} - {food.calories * food.quantity}{" "}
+                  {food.quantity}x {food.name} — {food.calories * food.quantity}{" "}
                   ккал
                 </li>
               ))}

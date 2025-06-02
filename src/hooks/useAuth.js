@@ -32,3 +32,5 @@ export const useAuth = () => {
 
   return { register, login, logout, error };
 };
+
+
