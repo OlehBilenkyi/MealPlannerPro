@@ -1,77 +1,77 @@
-import { useState, useEffect } from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
 } from "react-router-dom";
-import { auth } from "./services/firebaseConfig";
-import { signOut } from "firebase/auth";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import PrivateRoute from "./routes/PrivateRoute";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Meals from "./pages/Meals";
 import Stats from "./pages/Stats";
-import PrivateRoute from "./routes/PrivateRoute";
 
-export default function App() {
-  const [user, setUser] = useState(null);
-  const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState("meals");
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      setError(error.message);
-    }
-  };
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
-    });
-    return () => unsubscribe();
-  }, []);
+/**
+ * Основные маршруты приложения с приватными маршрутами
+ * @returns {JSX.Element}
+ */
+function AppRoutes() {
+  const { user } = useAuth();
 
   return (
-    <Router>
-      <div style={{ maxWidth: "800px", margin: "0 auto", padding: "20px" }}>
-        <h1>Meal Planner Pro</h1>
+    <Routes>
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route
+        path="/login"
+        element={!user ? <Login /> : <Navigate to="/dashboard" replace />}
+      />
+      <Route
+        path="/register"
+        element={!user ? <Register /> : <Navigate to="/dashboard" replace />}
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/meals"
+        element={
+          <PrivateRoute>
+            <Meals />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/stats"
+        element={
+          <PrivateRoute>
+            <Stats />
+          </PrivateRoute>
+        }
+      />
+    </Routes>
+  );
+}
 
-        {user && (
-          <div style={{ marginBottom: "20px" }}>
-            <p>Вы вошли как: {user.email}</p>
-            <button onClick={handleLogout}>Выйти</button>
-          </div>
-        )}
-
-        {error && <p style={{ color: "red" }}>{error}</p>}
-
-        {user && (
-          <nav>
-            <button onClick={() => setActiveTab("meals")}>Приёмы пищи</button>
-            <button onClick={() => setActiveTab("stats")}>Статистика</button>
-          </nav>
-        )}
-
-        <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-          <Route
-            path="/login"
-            element={user ? <Navigate to="/dashboard" /> : <Login />}
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute user={user}>
-                <Dashboard>
-                  <main>{activeTab === "meals" ? <Meals /> : <Stats />}</main>
-                </Dashboard>
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-      </div>
-    </Router>
+/**
+ * Главный компонент приложения с контекстом авторизации и роутером
+ * @returns {JSX.Element}
+ */
+export default function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <div style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
+          <h1>Meal Planner Pro</h1>
+          <AppRoutes />
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }

@@ -1,13 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  query,
-  where,
-  onSnapshot,
-} from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
@@ -27,20 +20,3 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const analytics = getAnalytics(app);
-
-// Коллекция meals
-export const mealsCollection = collection(db, "meals");
-
-// Функции для работы с meals
-export const addMeal = (mealData) => addDoc(mealsCollection, mealData);
-
-export const getUserMeals = (userId, date, callback) => {
-  const q = query(
-    mealsCollection,
-    where("userId", "==", userId),
-    where("date", "==", date)
-  );
-  return onSnapshot(q, callback);
-};
-
-export const getMealTypes = () => ["breakfast", "lunch", "dinner", "snack"];

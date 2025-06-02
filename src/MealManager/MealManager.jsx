@@ -1,15 +1,12 @@
 import { useState, useEffect } from "react";
-import {
-  addMeal,
-  getUserMeals,
-  getMealTypes,
-} from "../services/firebaseConfig";
-import { auth } from "../services/firebaseConfig";
+import { useAuth } from "../contexts/AuthContext";
+import { addMeal, getMealTypes } from "../services/mealService";
 
 const MealManager = () => {
+  const { currentUser } = useAuth();
   const [meals, setMeals] = useState([]);
   const [newMeal, setNewMeal] = useState({
-    date: new Date().toISOString().split("T")[0], // Сегодняшняя дата
+    date: new Date().toISOString().split("T")[0],
     type: "breakfast",
     foods: [],
     totalCalories: 0,
@@ -20,24 +17,17 @@ const MealManager = () => {
     quantity: 1,
   });
 
-  // Загрузка meals при изменении даты
   useEffect(() => {
-    if (!auth.currentUser) return;
+    if (!currentUser) return;
 
-    const unsubscribe = getUserMeals(
-      auth.currentUser.uid,
-      newMeal.date,
-      (querySnapshot) => {
-        const loadedMeals = [];
-        querySnapshot.forEach((doc) => {
-          loadedMeals.push({ id: doc.id, ...doc.data() });
-        });
-        setMeals(loadedMeals);
-      }
-    );
+    const unsubscribe = subscribeToUserMeals(currentUser.uid, (meals) => {
+      // При желании можно отфильтровать по дате newMeal.date,
+      // но можно просто показывать все приёмы пищи пользователя
+      setMeals(meals);
+    });
 
     return () => unsubscribe();
-  }, [newMeal.date]);
+  }, [currentUser]);
 
   const addFoodToMeal = () => {
     if (!currentFood.name || currentFood.calories <= 0) return;
@@ -58,18 +48,17 @@ const MealManager = () => {
   };
 
   const saveMeal = async () => {
-    if (!auth.currentUser || newMeal.foods.length === 0) return;
+    if (!currentUser || newMeal.foods.length === 0) return;
 
     try {
       await addMeal({
-        userId: auth.currentUser.uid,
+        userId: currentUser.uid,
         date: newMeal.date,
         type: newMeal.type,
         foods: newMeal.foods,
         totalCalories: newMeal.totalCalories,
       });
 
-      // Сброс формы после сохранения
       setNewMeal({
         ...newMeal,
         foods: [],
