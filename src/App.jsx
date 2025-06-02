@@ -10,11 +10,13 @@ import { signOut } from "firebase/auth";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Meals from "./pages/Meals";
+import Stats from "./pages/Stats";
 import PrivateRoute from "./routes/PrivateRoute";
 
 export default function App() {
   const [user, setUser] = useState(null);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState("meals");
 
   const handleLogout = async () => {
     try {
@@ -24,7 +26,6 @@ export default function App() {
     }
   };
 
-  // Слушатель изменения состояния аутентификации
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
@@ -46,6 +47,13 @@ export default function App() {
 
         {error && <p style={{ color: "red" }}>{error}</p>}
 
+        {user && (
+          <nav>
+            <button onClick={() => setActiveTab("meals")}>Приёмы пищи</button>
+            <button onClick={() => setActiveTab("stats")}>Статистика</button>
+          </nav>
+        )}
+
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route
@@ -56,15 +64,9 @@ export default function App() {
             path="/dashboard"
             element={
               <PrivateRoute user={user}>
-                <Dashboard />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/meals"
-            element={
-              <PrivateRoute user={user}>
-                <Meals />
+                <Dashboard>
+                  <main>{activeTab === "meals" ? <Meals /> : <Stats />}</main>
+                </Dashboard>
               </PrivateRoute>
             }
           />

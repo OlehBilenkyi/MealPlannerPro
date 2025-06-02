@@ -4,17 +4,22 @@ import {
   addMeal,
   subscribeToUserMeals,
   deleteMeal,
+  updateMeal,
   mealTypes,
 } from "../firebase/mealService";
 
 export default function Meals() {
   const { currentUser } = useAuth();
   const [meals, setMeals] = useState([]);
+  const [filteredMeals, setFilteredMeals] = useState([]);
   const [newMeal, setNewMeal] = useState({
     type: "breakfast",
     foods: [{ name: "", calories: 0, quantity: 1 }],
     date: new Date().toISOString().slice(0, 10),
   });
+  const [errors, setErrors] = useState({ date: "", foods: [] });
+  const [editingMeal, setEditingMeal] = useState(null);
+  const [filters, setFilters] = useState({ date: "", type: "" });
 
   // Подписка на данные
   useEffect(() => {
@@ -27,7 +32,46 @@ export default function Meals() {
     return () => unsubscribe();
   }, [currentUser]);
 
+  // Фильтрация приёмов пищи
+  useEffect(() => {
+    const filtered = meals.filter((meal) => {
+      return (
+        (!filters.date || meal.date === filters.date) &&
+        (!filters.type || meal.type === filters.type)
+      );
+    });
+    setFilteredMeals(filtered);
+  }, [meals, filters]);
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = { date: "", foods: [] };
+
+    if (!newMeal.date) {
+      newErrors.date = "Укажите дату";
+      isValid = false;
+    }
+
+    newMeal.foods.forEach((food, index) => {
+      newErrors.foods[index] = { name: "", calories: "" };
+
+      if (!food.name.trim()) {
+        newErrors.foods[index].name = "Введите название";
+        isValid = false;
+      }
+
+      if (food.calories <= 0) {
+        newErrors.foods[index].calories = "Калории должны быть > 0";
+        isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleAddMeal = async () => {
+    if (!validateForm()) return;
     if (!currentUser) return;
 
     try {
@@ -35,7 +79,6 @@ export default function Meals() {
         ...newMeal,
         userId: currentUser.uid,
       });
-      // Сброс формы
       setNewMeal({
         type: "breakfast",
         foods: [{ name: "", calories: 0, quantity: 1 }],
@@ -43,6 +86,34 @@ export default function Meals() {
       });
     } catch (error) {
       console.error("Ошибка при добавлении:", error);
+    }
+  };
+
+  const handleEdit = (meal) => {
+    setEditingMeal(meal);
+    setNewMeal({
+      date: meal.date,
+      type: meal.type,
+      foods: [...meal.foods],
+    });
+  };
+
+  const handleUpdateMeal = async () => {
+    if (!validateForm()) return;
+
+    try {
+      await updateMeal(editingMeal.id, {
+        ...newMeal,
+        userId: currentUser.uid,
+      });
+      setEditingMeal(null);
+      setNewMeal({
+        type: "breakfast",
+        foods: [{ name: "", calories: 0, quantity: 1 }],
+        date: new Date().toISOString().slice(0, 10),
+      });
+    } catch (error) {
+      console.error("Ошибка при обновлении:", error);
     }
   };
 
@@ -58,9 +129,37 @@ export default function Meals() {
     <div className="meals-container">
       <h2>Мои приёмы пищи</h2>
 
+      {/* Фильтры */}
+      <div className="filters">
+        <h3>Фильтры</h3>
+        <select
+          value={filters.type}
+          onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+        >
+          <option value="">Все типы</option>
+          {mealTypes.map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
+
+        <input
+          type="date"
+          value={filters.date}
+          onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+        />
+
+        <button onClick={() => setFilters({ date: "", type: "" })}>
+          Сбросить фильтры
+        </button>
+      </div>
+
       {/* Форма добавления */}
       <div className="add-meal-form">
-        <h3>Добавить приём пищи</h3>
+        <h3>
+          {editingMeal ? "Редактировать приём пищи" : "Добавить приём пищи"}
+        </h3>
         <div>
           <label>
             Дата:
@@ -69,6 +168,7 @@ export default function Meals() {
               value={newMeal.date}
               onChange={(e) => setNewMeal({ ...newMeal, date: e.target.value })}
             />
+            {errors.date && <span className="error">{errors.date}</span>}
           </label>
         </div>
         <div>
@@ -99,6 +199,10 @@ export default function Meals() {
                 setNewMeal({ ...newMeal, foods: newFoods });
               }}
             />
+            {errors.foods[index]?.name && (
+              <span className="error">{errors.foods[index].name}</span>
+            )}
+
             <input
               type="number"
               placeholder="Калории"
@@ -109,6 +213,10 @@ export default function Meals() {
                 setNewMeal({ ...newMeal, foods: newFoods });
               }}
             />
+            {errors.foods[index]?.calories && (
+              <span className="error">{errors.foods[index].calories}</span>
+            )}
+
             <input
               type="number"
               placeholder="Количество"
@@ -133,12 +241,16 @@ export default function Meals() {
           + Добавить продукт
         </button>
 
-        <button onClick={handleAddMeal}>Сохранить приём пищи</button>
+        {editingMeal ? (
+          <button onClick={handleUpdateMeal}>Обновить приём пищи</button>
+        ) : (
+          <button onClick={handleAddMeal}>Сохранить приём пищи</button>
+        )}
       </div>
 
       {/* Список приёмов пищи */}
       <div className="meals-list">
-        {meals.map((meal) => (
+        {filteredMeals.map((meal) => (
           <div key={meal.id} className="meal-card">
             <h3>
               {meal.type} - {meal.date}
@@ -151,6 +263,7 @@ export default function Meals() {
                 </li>
               ))}
             </ul>
+            <button onClick={() => handleEdit(meal)}>Редактировать</button>
             <button onClick={() => handleDelete(meal.id)}>Удалить</button>
           </div>
         ))}
