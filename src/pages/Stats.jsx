@@ -56,7 +56,9 @@ export default function Stats() {
         if (!isNaN(Number(parsed.dailyCalorieGoal))) {
           setDailyGoal(Number(parsed.dailyCalorieGoal));
         }
-      } catch {}
+      } catch (error) {
+        console.error(error);
+      }
     }
   }, [user, meals]);
 
@@ -80,7 +82,7 @@ export default function Stats() {
     plugins: {
       title: {
         display: true,
-        text: "Калории по типам приёма пищи за все время",
+        text: "Calories by Meal Type Over Time",
         font: { size: 18 },
       },
       legend: {
@@ -97,17 +99,17 @@ export default function Stats() {
 
   return (
     <div className="container">
-      <h2 className="heading">Статистика</h2>
+      <h2 className="heading">Statistics</h2>
 
       <div className="stats-grid">
         <div className="card">
-          <h3>Сегодняшние приёмы</h3>
-          <p>{dailyCount} шт.</p>
+          <h3>Today's Meals</h3>
+          <p>{dailyCount} items</p>
         </div>
         <div className="card">
-          <h3>Калории сегодня</h3>
+          <h3>Calories Today</h3>
           <p>
-            {todayCalories} / {dailyGoal} ккал
+            {todayCalories} / {dailyGoal} kcal
           </p>
           <div className="progress-wrapper">
             <div
@@ -121,15 +123,15 @@ export default function Stats() {
               }}
             />
           </div>
-          <small>{progressPercent}% от цели</small>
+          <small>{progressPercent}% of goal</small>
         </div>
         <div className="card">
-          <h3>Калории за 7 дней</h3>
-          <p>{weekCalories} ккал</p>
+          <h3>Calories in 7 Days</h3>
+          <p>{weekCalories} kcal</p>
         </div>
       </div>
 
-      <h3 style={{ marginTop: "24px" }}>По типам приёмов пищи</h3>
+      <h3 style={{ marginTop: "24px" }}>By Meal Types</h3>
       <div
         style={{
           width: "100%",
