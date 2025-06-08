@@ -31,31 +31,31 @@ const MealManager = () => {
         ),
       });
     } catch (error) {
-      console.error("Ошибка при добавлении приёма пищи:", error);
+      console.error("Error adding meal:", error);
     }
   };
 
   return (
     <div className="meal-manager">
-      <h2>Управление приёмами пищи</h2>
+      <h2>Meal Management</h2>
 
-      {/* 🔽 Форма добавления */}
+      {/* 🔽 Add Meal Form */}
       <AddMealForm onAdd={handleAddMeal} />
 
-      {/* 🔽 Список сохранённых приёмов пищи */}
+      {/* 🔽 List of Saved Meals */}
       <div className="meals-list">
-        <h3>Сохранённые приёмы пищи:</h3>
+        <h3>Saved Meals:</h3>
         {meals.map((meal) => (
           <div key={meal.id} className="meal-item">
             <h4>
               {meal.type} — {meal.date}
             </h4>
-            <p>Калории: {meal.totalCalories}</p>
+            <p>Calories: {meal.totalCalories}</p>
             <ul>
               {meal.foods.map((food, index) => (
                 <li key={index}>
                   {food.quantity}x {food.name} — {food.calories * food.quantity}{" "}
-                  ккал
+                  kcal
                 </li>
               ))}
             </ul>
