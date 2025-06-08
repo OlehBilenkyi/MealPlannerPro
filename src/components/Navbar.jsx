@@ -22,28 +22,28 @@ export default function Navbar() {
             to="/meals"
             className={({ isActive }) => (isActive ? "active" : "")}
           >
-            Мои приёмы
+            My Meals
           </NavLink>
 
           <NavLink
             to="/meals/new"
             className={({ isActive }) => (isActive ? "active" : "")}
           >
-            Добавить приём
+            Add Meal
           </NavLink>
 
           <NavLink
             to="/stats"
             className={({ isActive }) => (isActive ? "active" : "")}
           >
-            Статистика
+            Statistics
           </NavLink>
 
           <NavLink
             to="/profile"
             className={({ isActive }) => (isActive ? "active" : "")}
           >
-            Профиль
+            Profile
           </NavLink>
 
           <a
@@ -53,7 +53,7 @@ export default function Navbar() {
               logout();
             }}
           >
-            Выйти
+            Logout
           </a>
         </div>
       )}

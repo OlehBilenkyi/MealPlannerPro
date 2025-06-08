@@ -1,4 +1,3 @@
-// src/components/MealCard.jsx
 import React from "react";
 
 export default function MealCard({ meal, onEdit, onDelete }) {
@@ -7,19 +6,19 @@ export default function MealCard({ meal, onEdit, onDelete }) {
       <h3>
         {meal.type} - {meal.date}
       </h3>
-      <p>Всего калорий: {meal.totalCalories}</p>
+      <p>Total Calories: {meal.totalCalories}</p>
       <ul className="meal-list">
         {meal.foods.map((food, idx) => (
           <li key={idx}>
-            {food.name} - {food.calories} ккал × {food.quantity}
+            {food.name} - {food.calories} kcal × {food.quantity}
           </li>
         ))}
       </ul>
       <button className="btn btn-primary" onClick={() => onEdit(meal)}>
-        Редактировать
+        Edit
       </button>
       <button className="btn btn-danger" onClick={() => onDelete(meal.id)}>
-        Удалить
+        Delete
       </button>
     </div>
   );

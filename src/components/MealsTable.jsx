@@ -4,7 +4,7 @@ export default function MealsTable({ meals, onEdit, onDelete }) {
   if (meals.length === 0) {
     return (
       <p style={{ textAlign: "center", marginTop: "1rem" }}>
-        Нет приёмов, соответствующих фильтрам
+        No meals match the filters
       </p>
     );
   }
@@ -14,11 +14,11 @@ export default function MealsTable({ meals, onEdit, onDelete }) {
       <table>
         <thead>
           <tr>
-            <th>Дата</th>
-            <th>Тип</th>
-            <th>Калории</th>
-            <th>Продукты</th>
-            <th>Действия</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Calories</th>
+            <th>Foods</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -40,14 +40,14 @@ export default function MealsTable({ meals, onEdit, onDelete }) {
                   style={{ marginRight: "0.5rem", fontSize: "0.85rem" }}
                   onClick={() => onEdit(meal)}
                 >
-                  Изменить
+                  Edit
                 </button>
                 <button
                   className="btn btn-danger"
                   style={{ fontSize: "0.85rem" }}
                   onClick={() => onDelete(meal.id)}
                 >
-                  Удалить
+                  Delete
                 </button>
               </td>
             </tr>

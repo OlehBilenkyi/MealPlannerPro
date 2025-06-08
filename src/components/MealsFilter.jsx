@@ -3,25 +3,25 @@ import React from "react";
 export default function MealsFilter({ filters, onFilterChange, onClear }) {
   return (
     <div className="filters">
-      <h4 className="filter-heading">Фильтры</h4>
+      <h4 className="filter-heading">Filters</h4>
 
       <label className="form-label">
-        Тип приёма:
+        Meal Type:
         <select
           className="form-select"
           value={filters.type}
           onChange={(e) => onFilterChange("type", e.target.value)}
         >
-          <option value="">Все типы</option>
-          <option value="breakfast">breakfast</option>
-          <option value="lunch">lunch</option>
-          <option value="dinner">dinner</option>
-          <option value="snack">snack</option>
+          <option value="">All Types</option>
+          <option value="breakfast">Breakfast</option>
+          <option value="lunch">Lunch</option>
+          <option value="dinner">Dinner</option>
+          <option value="snack">Snack</option>
         </select>
       </label>
 
       <label className="form-label">
-        Дата:
+        Date:
         <input
           className="form-input"
           type="date"
@@ -31,7 +31,7 @@ export default function MealsFilter({ filters, onFilterChange, onClear }) {
       </label>
 
       <button className="btn btn-primary" onClick={onClear}>
-        Сбросить фильтры
+        Clear Filters
       </button>
     </div>
   );
