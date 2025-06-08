@@ -24,7 +24,7 @@ export default function Register() {
         style={{ maxWidth: "400px", margin: "0 auto" }}
       >
         <h2 className="heading" style={{ textAlign: "center" }}>
-          Регистрация в Meal Planner Pro
+          Register for Meal Planner Pro
         </h2>
         <form onSubmit={handleSubmit}>
           <label className="form-label">
@@ -39,7 +39,7 @@ export default function Register() {
           </label>
 
           <label className="form-label">
-            Пароль:
+            Password:
             <input
               className="form-input"
               type="password"
@@ -50,7 +50,7 @@ export default function Register() {
           </label>
 
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? "Загрузка…" : "Зарегистрироваться"}
+            {loading ? "Loading..." : "Register"}
           </button>
           {error && (
             <p style={{ color: "var(--color-danger)", marginTop: "0.5rem" }}>
@@ -60,9 +60,9 @@ export default function Register() {
         </form>
 
         <p style={{ marginTop: "1rem", textAlign: "center" }}>
-          Уже есть аккаунт?{" "}
+          Already have an account?{" "}
           <Link to="/login" style={{ color: "var(--color-primary)" }}>
-            Войти
+            Login
           </Link>
         </p>
       </div>
