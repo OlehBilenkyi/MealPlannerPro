@@ -18,10 +18,10 @@ export default function Login() {
     <div className="container">
       <div
         className="form-container"
-        style={{ maxWidth: "400px", margin: "0 auto" }}
+        style={{ maxWidth: "400px", margin: "0 auto", textAlign: "center" }}
       >
         <h2 className="heading" style={{ textAlign: "center" }}>
-          Вход в Meal Planner Pro
+          Login to Meal Planner Pro
         </h2>
         <form onSubmit={handleSubmit}>
           <label className="form-label">
@@ -36,7 +36,7 @@ export default function Login() {
           </label>
 
           <label className="form-label">
-            Пароль:
+            Password:
             <input
               className="form-input"
               type="password"
@@ -47,7 +47,7 @@ export default function Login() {
           </label>
 
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? "Загрузка…" : "Войти"}
+            {loading ? "Loading..." : "Login"}
           </button>
           {error && (
             <p style={{ color: "var(--color-danger)", marginTop: "0.5rem" }}>
@@ -56,11 +56,18 @@ export default function Login() {
           )}
         </form>
 
-        <p style={{ marginTop: "1rem", textAlign: "center" }}>
-          Нет аккаунта?{" "}
+        <p style={{ marginTop: "1rem" }}>
+          No account?{" "}
           <Link to="/register" style={{ color: "var(--color-primary)" }}>
-            Зарегистрироваться
+            Register
           </Link>
+        </p>
+        <p style={{ marginTop: "1rem" }}>
+          To see the app in action, register with any email and any password.
+        </p>
+        <p style={{ marginTop: "1rem" }}>
+          Чтобы посмотреть работу приложения - зарегистрируйтесь с любым email и
+          любым паролем.
         </p>
       </div>
     </div>

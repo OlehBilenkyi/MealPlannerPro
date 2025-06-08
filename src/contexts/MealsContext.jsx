@@ -1,20 +1,16 @@
+// MealsContext.jsx
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 
 const MealsContext = createContext();
 
-/**
- * Провайдер, который хранит массив приёмов (meals) в стейте
- * и синхронизирует его с localStorage.
- */
 export function MealsProvider({ children }) {
   const { user } = useAuth();
-  const [allMeals, setAllMeals] = useState([]); // весь массив из localStorage
-  const [userMeals, setUserMeals] = useState([]); // только для текущего user
+  const [allMeals, setAllMeals] = useState([]);
+  const [userMeals, setUserMeals] = useState([]);
 
   const storageKey = "meals";
 
-  // при монтировании – читаем из localStorage
   useEffect(() => {
     const raw = localStorage.getItem(storageKey) || "[]";
     let parsed = [];
@@ -26,7 +22,6 @@ export function MealsProvider({ children }) {
     setAllMeals(parsed);
   }, []);
 
-  // когда меняется user или allMeals – обновляем userMeals
   useEffect(() => {
     if (!user) {
       setUserMeals([]);
@@ -36,16 +31,11 @@ export function MealsProvider({ children }) {
     setUserMeals(filtered);
   }, [allMeals, user]);
 
-  // Записываем в localStorage и обновляем allMeals
   const syncMeals = (newAllMeals) => {
     setAllMeals(newAllMeals);
     localStorage.setItem(storageKey, JSON.stringify(newAllMeals));
   };
 
-  /**
-   * Добавляет новый приём в хранилище
-   * @param {{ date:string, type:string, foods: { name:string, calories:number, quantity:number }[] }} mealData
-   */
   const addMeal = (mealData) => {
     if (!user) return;
     const totalCalories = mealData.foods.reduce(
@@ -64,11 +54,6 @@ export function MealsProvider({ children }) {
     syncMeals(updated);
   };
 
-  /**
-   * Обновляет приём с данным id
-   * @param {string} id
-   * @param {{ date:string, type:string, foods:{ name:string, calories:number, quantity:number }[] }} updatedData
-   */
   const updateMeal = (id, updatedData) => {
     if (!user) return;
     const totalCalories = updatedData.foods.reduce(
@@ -89,10 +74,6 @@ export function MealsProvider({ children }) {
     syncMeals(newAll);
   };
 
-  /**
-   * Удаляет приём по id
-   * @param {string} id
-   */
   const deleteMeal = (id) => {
     const newAll = allMeals.filter((m) => m.id !== id);
     syncMeals(newAll);
@@ -107,5 +88,4 @@ export function MealsProvider({ children }) {
   );
 }
 
-/** Хук для доступа к контексту */
 export const useMeals = () => useContext(MealsContext);

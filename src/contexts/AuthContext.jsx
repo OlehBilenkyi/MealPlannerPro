@@ -1,65 +1,50 @@
+// AuthContext.jsx
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { auth } from "../services/firebaseConfig";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-} from "firebase/auth";
 
-// 1. Создаём контекст
 const AuthContext = createContext();
 
-// 2. Хук для удобного доступа
 export const useAuth = () => useContext(AuthContext);
 
-// 3. Провайдер
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
-    return () => unsubscribe();
+    // Загружаем пользователя из локального хранилища при монтировании
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+    setLoading(false);
   }, []);
 
-  // регистрация нового пользователя
   const register = async (email, password) => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      setUser(userCredential.user);
-      setError("");
-    } catch (err) {
-      setError(err.message);
-    }
+    // Простая регистрация без проверки пароля
+    const newUser = { email, password, uid: Date.now().toString() };
+    localStorage.setItem("user", JSON.stringify(newUser));
+    setUser(newUser);
+    setError("");
   };
 
-  // вход
   const login = async (email, password) => {
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      setUser(userCredential.user);
-      setError("");
-    } catch (err) {
-      setError(err.message);
+    // Простая проверка аутентификации
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      const user = JSON.parse(userData);
+      if (user.email === email && user.password === password) {
+        setUser(user);
+        setError("");
+      } else {
+        setError("Неверный email или пароль");
+      }
+    } else {
+      setError("Пользователь не найден");
     }
   };
 
-  // выход
   const logout = async () => {
-    await signOut(auth);
+    localStorage.removeItem("user");
     setUser(null);
   };
 

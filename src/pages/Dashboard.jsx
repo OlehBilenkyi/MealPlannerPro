@@ -37,7 +37,7 @@ export default function Dashboard() {
     setTodayCalories(tCal);
     setWeeklyCalories(wCal);
 
-    // Цель
+    // Goal
     const settingsRaw = localStorage.getItem(`userSettings_${user.uid}`);
     if (settingsRaw) {
       try {
@@ -46,7 +46,7 @@ export default function Dashboard() {
           setDailyGoal(Number(parsed.dailyCalorieGoal));
         }
       } catch {
-        // оставляем default
+        // leave default
       }
     }
   }, [user, meals]);
@@ -56,7 +56,7 @@ export default function Dashboard() {
     Math.round((todayCalories / dailyGoal) * 100)
   );
 
-  // 3 последних приёма
+  // 3 most recent meals
   const sortedByDateDesc = [...meals].sort(
     (a, b) => new Date(b.date) - new Date(a.date)
   );
@@ -64,18 +64,18 @@ export default function Dashboard() {
 
   return (
     <div className="container">
-      <h2 className="heading">Привет, {user?.displayName || user?.email}!</h2>
+      <h2 className="heading">Hello, {user?.displayName || user?.email}!</h2>
 
-      {/* Статистика */}
+      {/* Statistics */}
       <div className="stats-grid">
         <div className="card">
-          <h3>Сегодняшние приёмы</h3>
-          <p>{todayCount} шт.</p>
+          <h3>Today's Meals</h3>
+          <p>{todayCount} items</p>
         </div>
         <div className="card">
-          <h3>Калории сегодня</h3>
+          <h3>Calories Today</h3>
           <p>
-            {todayCalories} / {dailyGoal} ккал
+            {todayCalories} / {dailyGoal} kcal
           </p>
           <div className="progress-wrapper">
             <div
@@ -89,18 +89,18 @@ export default function Dashboard() {
               }}
             />
           </div>
-          <small>{progressPercent}% от цели</small>
+          <small>{progressPercent}% of goal</small>
         </div>
         <div className="card">
-          <h3>Калории за 7 дней</h3>
-          <p>{weeklyCalories} ккал</p>
+          <h3>Calories in 7 Days</h3>
+          <p>{weeklyCalories} kcal</p>
         </div>
       </div>
 
-      {/* Последние приёмы */}
+      {/* Recent Meals */}
       <div className="recent-meals" style={{ marginTop: "1.5rem" }}>
-        <h3>Последние приёмы</h3>
-        {recentMeals.length === 0 && <p>Нет добавленных приёмов</p>}
+        <h3>Recent Meals</h3>
+        {recentMeals.length === 0 && <p>No meals added</p>}
         <ul>
           {recentMeals.map((meal) => (
             <li
@@ -117,14 +117,14 @@ export default function Dashboard() {
               }}
             >
               <span>
-                {meal.date} — {meal.type} ({meal.totalCalories} ккал)
+                {meal.date} — {meal.type} ({meal.totalCalories} kcal)
               </span>
               <Link
                 to="/meals"
                 className="btn btn-secondary"
                 style={{ fontSize: "0.85rem" }}
               >
-                Перейти
+                Go to
               </Link>
             </li>
           ))}
