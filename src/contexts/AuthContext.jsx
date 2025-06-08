@@ -1,58 +1,91 @@
-// AuthContext.jsx
+// MealsContext.jsx
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "./AuthContext";
 
-const AuthContext = createContext();
+const MealsContext = createContext();
 
-export const useAuth = () => useContext(AuthContext);
+export function MealsProvider({ children }) {
+  const { user } = useAuth();
+  const [allMeals, setAllMeals] = useState([]);
+  const [userMeals, setUserMeals] = useState([]);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const storageKey = "meals";
 
   useEffect(() => {
-    // Загружаем пользователя из локального хранилища при монтировании
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      setUser(JSON.parse(userData));
+    const raw = localStorage.getItem(storageKey) || "[]";
+    let parsed = [];
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      parsed = [];
     }
-    setLoading(false);
+    setAllMeals(parsed);
   }, []);
 
-  const register = async (email, password) => {
-    // Простая регистрация без проверки пароля
-    const newUser = { email, password, uid: Date.now().toString() };
-    localStorage.setItem("user", JSON.stringify(newUser));
-    setUser(newUser);
-    setError("");
-  };
-
-  const login = async (email, password) => {
-    // Простая проверка аутентификации
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      const user = JSON.parse(userData);
-      if (user.email === email && user.password === password) {
-        setUser(user);
-        setError("");
-      } else {
-        setError("Неверный email или пароль");
-      }
-    } else {
-      setError("Пользователь не найден");
+  useEffect(() => {
+    if (!user) {
+      setUserMeals([]);
+      return;
     }
+    const filtered = allMeals.filter((m) => m.userId === user.uid);
+    setUserMeals(filtered);
+  }, [allMeals, user]);
+
+  const syncMeals = (newAllMeals) => {
+    setAllMeals(newAllMeals);
+    localStorage.setItem(storageKey, JSON.stringify(newAllMeals));
   };
 
-  const logout = async () => {
-    localStorage.removeItem("user");
-    setUser(null);
+  const addMeal = (mealData) => {
+    if (!user) return;
+    const totalCalories = mealData.foods.reduce(
+      (sum, f) => sum + f.calories * f.quantity,
+      0
+    );
+    const newMeal = {
+      id: Date.now().toString(),
+      userId: user.uid,
+      date: mealData.date,
+      type: mealData.type,
+      foods: mealData.foods,
+      totalCalories,
+    };
+    const updated = [...allMeals, newMeal];
+    syncMeals(updated);
+  };
+
+  const updateMeal = (id, updatedData) => {
+    if (!user) return;
+    const totalCalories = updatedData.foods.reduce(
+      (sum, f) => sum + f.calories * f.quantity,
+      0
+    );
+    const newAll = allMeals.map((m) =>
+      m.id === id
+        ? {
+            ...m,
+            date: updatedData.date,
+            type: updatedData.type,
+            foods: updatedData.foods,
+            totalCalories,
+          }
+        : m
+    );
+    syncMeals(newAll);
+  };
+
+  const deleteMeal = (id) => {
+    const newAll = allMeals.filter((m) => m.id !== id);
+    syncMeals(newAll);
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, register, login, logout, error, loading }}
+    <MealsContext.Provider
+      value={{ meals: userMeals, addMeal, updateMeal, deleteMeal }}
     >
       {children}
-    </AuthContext.Provider>
+    </MealsContext.Provider>
   );
-};
+}
+
+export const useMeals = () => useContext(MealsContext);
