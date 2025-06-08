@@ -68,18 +68,18 @@ export default function AddMealForm({ onAdd, meal, onUpdate }) {
     const newErrors = { date: "", foods: [] };
 
     if (!formState.date) {
-      newErrors.date = "Укажите дату";
+      newErrors.date = "Please specify a date";
       isValid = false;
     }
 
     formState.foods.forEach((food, i) => {
       const itemErr = { name: "", calories: "" };
       if (!food.name.trim()) {
-        itemErr.name = "Введите название";
+        itemErr.name = "Please enter a name";
         isValid = false;
       }
       if (food.calories === "" || Number(food.calories) <= 0) {
-        itemErr.calories = "Калории должны быть > 0";
+        itemErr.calories = "Calories must be greater than 0";
         isValid = false;
       }
       if (food.quantity === "" || Number(food.quantity) <= 0) {
@@ -126,7 +126,7 @@ export default function AddMealForm({ onAdd, meal, onUpdate }) {
     <form onSubmit={handleSubmit}>
       <div style={{ marginBottom: "1rem" }}>
         <label className="form-label">
-          Дата:
+          Date:
           <input
             className="form-input"
             type="date"
@@ -138,7 +138,7 @@ export default function AddMealForm({ onAdd, meal, onUpdate }) {
         {errors.date && <div className="form-error">{errors.date}</div>}
 
         <label className="form-label">
-          Тип приёма:
+          Meal Type:
           <select
             className="form-select"
             name="type"
@@ -178,10 +178,10 @@ export default function AddMealForm({ onAdd, meal, onUpdate }) {
 
       <div style={{ display: "flex", gap: "0.5rem" }}>
         <button type="button" className="btn btn-primary" onClick={addFoodItem}>
-          + Добавить продукт
+          + Add Food Item
         </button>
         <button type="submit" className="btn btn-success">
-          {meal ? "Обновить приём питания" : "Сохранить приём питания"}
+          {meal ? "Update Meal" : "Save Meal"}
         </button>
       </div>
     </form>

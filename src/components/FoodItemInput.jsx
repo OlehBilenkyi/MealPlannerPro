@@ -10,26 +10,26 @@ export default function FoodItemInput({
 }) {
   return (
     <div className="food-item">
-      {/* Название продукта */}
+      {/* Product Name */}
       <label className="form-label">
-        Название:
+        Name:
         <input
           className="form-input"
-          placeholder="Название"
+          placeholder="Name"
           value={food.name}
           onChange={(e) => onChange(index, "name", e.target.value)}
         />
         {errors?.name && <div className="form-error">{errors.name}</div>}
       </label>
 
-      {/* Калории */}
+      {/* Calories */}
       <label className="form-label">
-        Калории:
+        Calories:
         <input
           className="form-input"
           type="number"
           min="0"
-          placeholder="Калории"
+          placeholder="Calories"
           value={food.calories === "" ? "" : food.calories}
           onChange={(e) => {
             const val = e.target.value;
@@ -41,14 +41,14 @@ export default function FoodItemInput({
         )}
       </label>
 
-      {/* Количество */}
+      {/* Quantity */}
       <label className="form-label">
-        Количество:
+        Quantity:
         <input
           className="form-input"
           type="number"
           min="1"
-          placeholder="Количество"
+          placeholder="Quantity"
           value={food.quantity === "" ? "" : food.quantity}
           onChange={(e) => {
             const val = e.target.value;
@@ -57,7 +57,7 @@ export default function FoodItemInput({
         />
       </label>
 
-      {/* Удалить */}
+      {/* Remove */}
       {showRemove && (
         <button
           type="button"
@@ -65,7 +65,7 @@ export default function FoodItemInput({
           onClick={() => onRemove(index)}
           style={{ alignSelf: "flex-end", marginTop: "8px" }}
         >
-          Удалить
+          Remove
         </button>
       )}
     </div>
