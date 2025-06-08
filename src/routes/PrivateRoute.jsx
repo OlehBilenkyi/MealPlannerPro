@@ -17,7 +17,7 @@ export default function PrivateRoute({ children }) {
           fontSize: "1.25rem",
         }}
       >
-        Загрузка…
+        Loading...
       </div>
     );
   }
