@@ -79,7 +79,7 @@ export default function Meals({ initialMode }) {
 
   return (
     <div className="container">
-      <h2 className="heading">Мои приёмы пищи</h2>
+      <h2 className="heading">My Meals</h2>
 
       <ActionBar
         onClearFilters={handleClearFilters}
@@ -93,9 +93,7 @@ export default function Meals({ initialMode }) {
       />
 
       <div className="form-container" style={{ marginTop: "1rem" }}>
-        <h3>
-          {editingMeal ? "Редактировать приём пищи" : "Добавить приём питания"}
-        </h3>
+        <h3>{editingMeal ? "Edit Meal" : "Add Meal"}</h3>
         <AddMealForm
           onAdd={handleAdd}
           meal={editingMeal}
