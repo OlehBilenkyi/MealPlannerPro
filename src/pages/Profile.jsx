@@ -48,68 +48,68 @@ export default function Profile() {
     setLoading(false);
   }, [uid, user.displayName]);
 
-  if (!user) return <p>Загрузка...</p>;
+  if (!user) return <p>Loading...</p>;
 
   const handleSave = async (e) => {
     e.preventDefault();
     setMessage("");
 
-    // Смена пароля (если введены оба поля)
+    // Change password (if both fields are entered)
     if (newPassword || confirmPassword) {
       if (newPassword !== confirmPassword) {
-        setMessage("Пароли не совпадают.");
+        setMessage("Passwords do not match.");
         return;
       }
       if (newPassword.length < 6) {
-        setMessage("Пароль должен быть минимум 6 символов.");
+        setMessage("Password must be at least 6 characters long.");
         return;
       }
       try {
         await updatePassword(auth.currentUser, newPassword);
-        setMessage("Пароль успешно изменён.");
+        setMessage("Password successfully changed.");
       } catch (err) {
         console.error(err);
-        setMessage("Не удалось сменить пароль: " + err.message);
+        setMessage("Failed to change password: " + err.message);
         return;
       }
     }
 
-    // Смена displayName (если изменилось)
+    // Change display name (if it has changed)
     if (displayName !== user.displayName) {
       try {
         await updateProfile(auth.currentUser, { displayName });
       } catch (err) {
         console.error(err);
-        setMessage("Не удалось обновить имя: " + err.message);
+        setMessage("Failed to update name: " + err.message);
         return;
       }
     }
 
-    // Сохранение цели по калориям в localStorage
+    // Save calorie goal to localStorage
     try {
       const goalNumber = parseInt(dailyCalorieGoal, 10);
       if (isNaN(goalNumber) || goalNumber < 0) {
-        setMessage("Целевая калорийность должна быть неотрицательным числом.");
+        setMessage("Daily calorie goal must be a non-negative number.");
         return;
       }
       const settingsToSave = { displayName, dailyCalorieGoal: goalNumber };
       localStorage.setItem(storageKey, JSON.stringify(settingsToSave));
-      setMessage("Настройки сохранены.");
+      setMessage("Settings saved.");
     } catch (err) {
       console.error(err);
-      setMessage("Не удалось сохранить настройки: " + err.message);
+      setMessage("Failed to save settings: " + err.message);
     }
   };
 
   return (
     <div className="container">
-      <h2 className="heading">Профиль пользователя</h2>
+      <h2 className="heading">User Profile</h2>
 
       {loading ? (
-        <p>Загрузка...</p>
+        <p>Loading...</p>
       ) : (
         <form onSubmit={handleSave}>
-          {/* === Сеточный контейнер: 3 колонки === */}
+          {/* Grid container: 3 columns */}
           <div className="profile-form">
             <label>
               Email:
@@ -122,7 +122,7 @@ export default function Profile() {
             </label>
 
             <label>
-              Имя для отображения:
+              Display Name:
               <input
                 className="form-input"
                 type="text"
@@ -133,7 +133,7 @@ export default function Profile() {
             </label>
 
             <label>
-              Целевая калорийность (ккал/день):
+              Daily Calorie Goal (kcal/day):
               <input
                 className="form-input"
                 type="number"
@@ -144,35 +144,35 @@ export default function Profile() {
               />
             </label>
 
-            {/* Поля пароля, занимающие всю ширину (2 колонки) */}
+            {/* Password fields taking full width (2 columns) */}
             <label className="full-width">
-              Новый пароль:
+              New Password:
               <input
                 className="form-input"
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Оставьте пустым, чтобы не менять"
+                placeholder="Leave blank to remain unchanged"
               />
             </label>
 
             <label className="full-width">
-              Подтверждение нового пароля:
+              Confirm New Password:
               <input
                 className="form-input"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Повторите новый пароль"
+                placeholder="Repeat the new password"
               />
             </label>
           </div>
 
-          {/* Сообщение об ошибке/успехе */}
+          {/* Error/success message */}
           {message && (
             <p
               style={{
-                color: message.startsWith("Не удалось") ? "red" : "green",
+                color: message.startsWith("Failed") ? "red" : "green",
                 marginBottom: "1rem",
               }}
             >
@@ -181,7 +181,7 @@ export default function Profile() {
           )}
 
           <button className="btn btn-primary" type="submit">
-            Сохранить изменения
+            Save Changes
           </button>
         </form>
       )}
@@ -191,7 +191,7 @@ export default function Profile() {
         onClick={logout}
         style={{ marginTop: "20px" }}
       >
-        Выйти
+        Logout
       </button>
     </div>
   );
