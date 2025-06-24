@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { updateProfile, updatePassword } from "firebase/auth";
-import { auth } from "../../services/firebaseConfig";
 import {
   FiUser,
   FiLock,
@@ -15,11 +13,12 @@ import {
 import "./Profile.css";
 
 export default function Profile() {
-  const { user, logout } = useAuth();
+  const { user, logout, register } = useAuth();
   const uid = user?.uid;
 
   const [formData, setFormData] = useState({
     displayName: "",
+    email: "",
     dailyCalorieGoal: "2000",
     newPassword: "",
     confirmPassword: "",
@@ -32,7 +31,7 @@ export default function Profile() {
   const storageKey = `userSettings_${uid}`;
 
   useEffect(() => {
-    if (!uid) return;
+    if (!user) return;
 
     const loadSettings = () => {
       const raw = localStorage.getItem(storageKey);
@@ -41,7 +40,8 @@ export default function Profile() {
           const parsed = JSON.parse(raw);
           setFormData({
             ...formData,
-            displayName: parsed.displayName || user.displayName || "",
+            displayName: parsed.displayName || "",
+            email: user.email || "",
             dailyCalorieGoal: parsed.dailyCalorieGoal?.toString() || "2000",
           });
         } catch {
@@ -55,19 +55,20 @@ export default function Profile() {
 
     const setDefaultSettings = () => {
       const defaults = {
-        displayName: user.displayName || "",
+        displayName: "",
         dailyCalorieGoal: 2000,
       };
       localStorage.setItem(storageKey, JSON.stringify(defaults));
       setFormData({
         ...formData,
         displayName: defaults.displayName,
+        email: user.email || "",
         dailyCalorieGoal: "2000",
       });
     };
 
     loadSettings();
-  }, [uid, user.displayName]);
+  }, [uid, user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -81,55 +82,38 @@ export default function Profile() {
     e.preventDefault();
     setMessage({ text: "", type: "" });
 
-    // Password validation
-    if (formData.newPassword || formData.confirmPassword) {
-      if (formData.newPassword !== formData.confirmPassword) {
-        setMessage({ text: "Passwords do not match", type: "error" });
-        return;
+    try {
+      // Обновление email (если изменился)
+      if (formData.email && formData.email !== user.email) {
+        // В вашей текущей реализации нужно перерегистрировать пользователя
+        await register(formData.email, formData.newPassword || user.password);
+        setMessage({ text: "Email updated successfully", type: "success" });
       }
-      if (formData.newPassword.length < 6) {
-        setMessage({
-          text: "Password must be at least 6 characters",
-          type: "error",
-        });
-        return;
-      }
-      try {
-        await updatePassword(auth.currentUser, formData.newPassword);
-        setFormData({ ...formData, newPassword: "", confirmPassword: "" });
-        setMessage({ text: "Password updated successfully", type: "success" });
-      } catch (err) {
-        setMessage({
-          text: `Password update failed: ${err.message}`,
-          type: "error",
-        });
-        return;
-      }
-    }
 
-    // Update display name if changed
-    if (formData.displayName !== user.displayName) {
-      try {
-        await updateProfile(auth.currentUser, {
-          displayName: formData.displayName,
-        });
+      // Обновление пароля (если введен новый)
+      if (
+        formData.newPassword &&
+        formData.newPassword === formData.confirmPassword
+      ) {
+        if (formData.newPassword.length < 6) {
+          setMessage({
+            text: "Password must be at least 6 characters",
+            type: "error",
+          });
+          return;
+        }
+        // В вашей текущей реализации нужно перерегистрировать пользователя
+        await register(user.email, formData.newPassword);
+        setFormData({ ...formData, newPassword: "", confirmPassword: "" });
         setMessage((prev) => ({
           text: prev.text
-            ? `${prev.text} Display name updated`
-            : "Display name updated",
+            ? `${prev.text} and password updated`
+            : "Password updated",
           type: "success",
         }));
-      } catch (err) {
-        setMessage({
-          text: `Name update failed: ${err.message}`,
-          type: "error",
-        });
-        return;
       }
-    }
 
-    // Save calorie goal
-    try {
+      // Сохранение имени и цели по калориям
       const goalNumber = parseInt(formData.dailyCalorieGoal, 10);
       if (isNaN(goalNumber) || goalNumber < 1000 || goalNumber > 10000) {
         setMessage({
@@ -144,12 +128,13 @@ export default function Profile() {
         dailyCalorieGoal: goalNumber,
       };
       localStorage.setItem(storageKey, JSON.stringify(settingsToSave));
+
       setMessage((prev) => ({
-        text: prev.text ? `${prev.text} Settings saved` : "Settings saved",
+        text: prev.text ? `${prev.text} and settings saved` : "Settings saved",
         type: "success",
       }));
     } catch (err) {
-      setMessage({ text: `Save failed: ${err.message}`, type: "error" });
+      setMessage({ text: `Update failed: ${err.message}`, type: "error" });
     }
   };
 
@@ -182,9 +167,10 @@ export default function Profile() {
                   <FiMail className="input-icon" />
                   <input
                     type="email"
-                    value={user.email}
-                    disabled
-                    className="disabled-input"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
                   />
                 </div>
               </div>

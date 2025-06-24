@@ -17,7 +17,7 @@ import {
 import { Card } from "../../components/ui/Card/Card";
 import MealsFilter from "../../components/Meal/MealsFilter/MealsFilter";
 import AddMealForm from "../../components/AddMealForm/AddMealForm";
-import MealsTable from "../../components/Meal/MealsTable/MealsTable";
+import MealsTable from "../../components/MealsTable/MealsTable";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./Meals.css";
