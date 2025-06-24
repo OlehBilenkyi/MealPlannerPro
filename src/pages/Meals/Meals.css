@@ -1,106 +1,164 @@
 :root {
-  --primary: #4361ee;
-  --primary-light: rgba(67, 97, 238, 0.1);
-  --danger: #ef233c;
-  --danger-light: rgba(239, 35, 60, 0.1);
-  --success: #4cc9f0;
-  --dark: #2b2d42;
-  --gray: #8d99ae;
-  --light: #edf2f4;
+  --primary: #6c5ce7;
+  --primary-light: rgba(108, 92, 231, 0.1);
+  --primary-dark: #5649c0;
+  --secondary: #00cec9;
+  --danger: #ff7675;
+  --warning: #fdcb6e;
+  --success: #55efc4;
+  --dark: #2d3436;
+  --gray: #636e72;
+  --light: #dfe6e9;
   --white: #ffffff;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --radius: 12px;
-  --transition: all 0.3s ease;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 15px 25px rgba(0, 0, 0, 0.1);
+  --radius: 16px;
+  --radius-sm: 8px;
+  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .meals-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 .meals-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--light);
+  margin-bottom: 1rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.header-content h1 {
-  font-size: 2rem;
+.header-content {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 2.2rem;
   margin: 0;
+  font-weight: 700;
   color: var(--dark);
+  line-height: 1.2;
 }
 
-.header-content .accent-text {
+.page-title .accent-text {
   color: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.header-content p {
+.page-subtitle {
   margin: 0.5rem 0 0;
   color: var(--gray);
   font-size: 1rem;
+  font-weight: 400;
 }
 
-.primary-btn {
+.header-stats {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.stat-card {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius);
-  font-weight: 500;
-  cursor: pointer;
-  transition: var(--transition);
-  border: none;
-  font-size: 1rem;
-}
-
-.primary-btn.add {
-  background: var(--primary);
-  color: white;
-}
-
-.primary-btn.add:hover {
-  background: #3a56d4;
-  transform: translateY(-2px);
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--white);
+  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
+  transition: var(--transition);
 }
 
-.primary-btn.cancel {
-  background: var(--light);
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-icon-container {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon {
+  color: var(--primary);
+  font-size: 1.2rem;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--dark);
+  line-height: 1;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.75rem;
   color: var(--gray);
-}
-
-.primary-btn.cancel:hover {
-  background: #e0e4e8;
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .controls-section {
-  margin-bottom: 2rem;
+  margin-top: 1rem;
 }
 
-.filters-container {
-  background: var(--white);
-  border-radius: var(--radius);
+.filters-card {
   padding: 1.5rem;
+  border-radius: var(--radius);
+  background: var(--white);
   box-shadow: var(--shadow-sm);
+  transition: var(--transition);
 }
 
-.filters-header {
+.filters-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.controls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 1.5rem;
-  color: var(--dark);
 }
 
-.filters-header h3 {
+.section-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+}
+
+.section-title h3 {
   margin: 0;
   font-size: 1.1rem;
+  color: var(--dark);
 }
 
 .filter-badge {
@@ -114,32 +172,48 @@
   justify-content: center;
   font-size: 0.75rem;
   font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+.action-section {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.floating-action-btn {
+  box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3);
+  transition: var(--transition);
+}
+
+.floating-action-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 6px 25px rgba(108, 92, 231, 0.4);
 }
 
 .form-section {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--light);
-  animation: slideIn 0.3s ease-out;
+  animation: slideIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  margin-top: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.form-header h2 {
-  margin: 0 0 1.5rem;
-  color: var(--dark);
-  font-size: 1.3rem;
+.form-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--light);
+}
+
+.form-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--dark);
+  font-weight: 600;
 }
 
 .meals-list-section {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 2rem;
-  box-shadow: var(--shadow-sm);
+  margin-top: 1rem;
 }
 
 .section-header {
@@ -151,22 +225,67 @@
 
 .section-header h3 {
   margin: 0;
+  font-size: 1.3rem;
   color: var(--dark);
-  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .results-count {
-  background: var(--light);
-  color: var(--gray);
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
   font-size: 0.85rem;
+  color: var(--gray);
+  background: var(--light);
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
 }
 
+.meals-card {
+  overflow: hidden;
+  padding: 0;
+}
+
+/* Календарь */
+.react-datepicker {
+  font-family: inherit;
+  border: none;
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius);
+}
+
+.react-datepicker__header {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border: none;
+  border-radius: var(--radius) var(--radius) 0 0 !important;
+  color: white;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+  color: white;
+}
+
+.react-datepicker__day--selected {
+  background: var(--primary);
+  color: white;
+}
+
+.react-datepicker__day:hover {
+  background: var(--primary-light);
+}
+
+.react-datepicker__time-container {
+  border-left: 1px solid var(--light);
+}
+
+.react-datepicker__time-list-item--selected {
+  background: var(--primary) !important;
+  color: white;
+}
+
+/* Анимации */
 @keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -174,28 +293,40 @@
   }
 }
 
-/* Responsive styles */
+/* Адаптивность */
 @media (max-width: 768px) {
   .meals-container {
-    padding: 1.5rem;
+    padding: 1.5rem 1rem;
   }
 
   .meals-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 1.5rem;
   }
 
-  .form-section,
-  .meals-list-section,
-  .filters-container {
-    padding: 1.25rem;
+  .header-stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
 }
 
 @media (max-width: 480px) {
-  .primary-btn {
-    padding: 0.75rem 1rem;
-    font-size: 0.9rem;
+  .page-title {
+    font-size: 1.8rem;
+  }
+
+  .stat-card {
+    padding: 0.5rem;
+  }
+
+  .stat-value {
+    font-size: 1rem;
   }
 }

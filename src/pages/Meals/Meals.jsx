@@ -1,10 +1,25 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useMeals } from "../../contexts/MealsContext";
-import { FiPlus, FiFilter, FiX, FiEdit2, FiTrash2 } from "react-icons/fi";
+import {
+  FiPlus,
+  FiFilter,
+  FiX,
+  FiClock,
+  FiCalendar,
+  FiTrendingUp,
+} from "react-icons/fi";
+import { MealTypePill } from "../../components/ui/Pills/Pills";
+import {
+  PrimaryButton,
+  SecondaryButton,
+} from "../../components/ui/Buttons/Buttons";
+import { Card } from "../../components/ui/Card/Card";
 import MealsFilter from "../../components/MealsFilter/MealsFilter";
 import AddMealForm from "../../components/AddMealForm/AddMealForm";
 import MealsTable from "../../components/MealsTable/MealsTable";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import "./Meals.css";
 
 export default function Meals({ initialMode }) {
@@ -16,6 +31,10 @@ export default function Meals({ initialMode }) {
   const [filters, setFilters] = useState({ date: "", type: "" });
   const [showForm, setShowForm] = useState(false);
   const [activeFilters, setActiveFilters] = useState(0);
+  const [stats, setStats] = useState({
+    totalCalories: 0,
+    mealCount: 0,
+  });
 
   useEffect(() => {
     if (initialMode === "new") {
@@ -25,7 +44,7 @@ export default function Meals({ initialMode }) {
   }, [initialMode]);
 
   useEffect(() => {
-    const res = meals
+    const filtered = meals
       .filter((meal) => {
         const mealDate = meal.date.slice(0, 10);
         const mealType = meal.type.trim().toLowerCase();
@@ -37,7 +56,17 @@ export default function Meals({ initialMode }) {
       })
       .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    setFilteredMeals(res);
+    setFilteredMeals(filtered);
+
+    // Calculate stats
+    const totalCalories = filtered.reduce(
+      (sum, meal) => sum + (meal.totalCalories || 0),
+      0
+    );
+    setStats({
+      totalCalories,
+      mealCount: filtered.length,
+    });
 
     // Calculate active filters count
     let count = 0;
@@ -99,45 +128,72 @@ export default function Meals({ initialMode }) {
 
   return (
     <div className="meals-container">
-      <div className="meals-header">
+      <header className="meals-header">
         <div className="header-content">
-          <h1>
-            <span className="accent-text">My</span> Meals
+          <h1 className="page-title">
+            <span className="accent-text">Nutrition</span> Journal
           </h1>
-          <p>Track and manage your nutrition</p>
+          <p className="page-subtitle">Track your health journey</p>
         </div>
 
-        <button
-          className={`primary-btn ${showForm ? "cancel" : "add"}`}
-          onClick={toggleForm}
-        >
-          {showForm ? <FiX size={18} /> : <FiPlus size={18} />}
-          {showForm ? "Cancel" : "Add Meal"}
-        </button>
-      </div>
+        <div className="header-stats">
+          <div className="stat-card">
+            <div className="stat-icon-container">
+              <FiClock className="stat-icon" />
+            </div>
+            <div>
+              <span className="stat-value">{stats.mealCount}</span>
+              <span className="stat-label">Meals</span>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon-container">
+              <FiTrendingUp className="stat-icon" />
+            </div>
+            <div>
+              <span className="stat-value">{stats.totalCalories}</span>
+              <span className="stat-label">Calories</span>
+            </div>
+          </div>
+        </div>
+      </header>
 
       <div className="controls-section">
-        <div className="filters-container">
-          <div className="filters-header">
-            <FiFilter size={18} />
-            <h3>Filters</h3>
-            {activeFilters > 0 && (
-              <span className="filter-badge">{activeFilters}</span>
-            )}
+        <Card className="filters-card">
+          <div className="controls-header">
+            <div className="section-title">
+              <div className="section-icon">
+                <FiFilter />
+              </div>
+              <h3>Filter Meals</h3>
+              {activeFilters > 0 && (
+                <span className="filter-badge">{activeFilters}</span>
+              )}
+            </div>
+            <SecondaryButton onClick={handleClearFilters} small>
+              Clear All
+            </SecondaryButton>
           </div>
 
-          <MealsFilter
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onClear={handleClearFilters}
-          />
-        </div>
+          <MealsFilter filters={filters} onFilterChange={handleFilterChange} />
+        </Card>
+      </div>
+
+      <div className="action-section">
+        <PrimaryButton
+          onClick={toggleForm}
+          icon={showForm ? <FiX /> : <FiPlus />}
+          className="floating-action-btn"
+        >
+          {showForm ? "Cancel" : "Add Meal"}
+        </PrimaryButton>
       </div>
 
       {showForm && (
-        <div className="form-section slide-in">
+        <Card className="form-section slide-in">
           <div className="form-header">
-            <h2>{editingMeal ? "Edit Meal" : "Log New Meal"}</h2>
+            <h3>{editingMeal ? "Edit Meal" : "Log New Meal"}</h3>
+            {editingMeal && <MealTypePill type={editingMeal.type} />}
           </div>
           <AddMealForm
             onAdd={handleAdd}
@@ -148,20 +204,24 @@ export default function Meals({ initialMode }) {
               setEditingMeal(null);
             }}
           />
-        </div>
+        </Card>
       )}
 
       <div className="meals-list-section">
         <div className="section-header">
           <h3>Your Meal History</h3>
-          <span className="results-count">{filteredMeals.length} entries</span>
+          <span className="results-count">
+            Showing {filteredMeals.length} of {meals.length} entries
+          </span>
         </div>
 
-        <MealsTable
-          meals={filteredMeals}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <Card className="meals-card">
+          <MealsTable
+            meals={filteredMeals}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </Card>
       </div>
     </div>
   );

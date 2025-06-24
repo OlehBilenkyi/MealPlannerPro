@@ -5,39 +5,35 @@ import "./MealsTable.css";
 export default function MealsTable({ meals, onEdit, onDelete }) {
   if (meals.length === 0) {
     return (
-      <div className="empty-state">
-        <div className="empty-state-content">
-          <FiPlusCircle size={48} className="empty-icon" />
-          <h3>No meals found</h3>
-          <p>Try adjusting your filters or add a new meal</p>
+      <div className="table-empty-state">
+        <div className="empty-content">
+          <FiPlusCircle className="empty-icon" />
+          <h3>No Meals Found</h3>
+          <p>Try adjusting filters or add a new meal</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="meals-table-container">
-      <div className="table-responsive">
+    <div className="table-container">
+      <div className="table-scroll">
         <table className="meals-table">
           <thead>
             <tr>
-              <th className="date-col">Date</th>
-              <th className="type-col">Type</th>
-              <th className="calories-col">Calories</th>
-              <th className="foods-col">Food Items</th>
-              <th className="actions-col">Actions</th>
+              <th>Date</th>
+              <th>Meal Type</th>
+              <th>Calories</th>
+              <th>Food Items</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {meals.map((meal, index) => (
-              <tr
-                key={meal.id}
-                className="meal-row"
-                style={{ "--delay": index * 0.05 + "s" }}
-              >
-                <td className="date-cell">
-                  <div className="date-wrapper">
-                    <span className="day">
+            {meals.map((meal) => (
+              <tr key={meal.id} className="meal-row">
+                <td>
+                  <div className="date-cell">
+                    <span className="weekday">
                       {new Date(meal.date).toLocaleDateString("en-US", {
                         weekday: "short",
                       })}
@@ -50,27 +46,25 @@ export default function MealsTable({ meals, onEdit, onDelete }) {
                     </span>
                   </div>
                 </td>
-                <td className="type-cell">
+                <td>
                   <span className={`meal-type ${meal.type.toLowerCase()}`}>
                     {meal.type}
                   </span>
                 </td>
-                <td className="calories-cell">
-                  <div className="calories-badge">
+                <td>
+                  <div className="calories-cell">
                     {meal.totalCalories}
                     <span className="unit">kcal</span>
                   </div>
                 </td>
-                <td className="foods-cell">
+                <td>
                   <div className="food-items">
                     {meal.foods.slice(0, 3).map((food, idx) => (
                       <div key={idx} className="food-item">
                         <span className="food-name">{food.name}</span>
-                        <span className="food-quantity">×{food.quantity}</span>
+                        <span className="quantity">×{food.quantity}</span>
                         {food.calories && (
-                          <span className="food-calories">
-                            {food.calories}kcal
-                          </span>
+                          <span className="calories">{food.calories}kcal</span>
                         )}
                       </div>
                     ))}
@@ -81,21 +75,21 @@ export default function MealsTable({ meals, onEdit, onDelete }) {
                     )}
                   </div>
                 </td>
-                <td className="actions-cell">
-                  <div className="action-buttons">
+                <td>
+                  <div className="actions">
                     <button
-                      className="action-btn edit-btn"
+                      className="edit-btn"
                       onClick={() => onEdit(meal)}
-                      aria-label="Edit meal"
+                      aria-label="Edit"
                     >
-                      <FiEdit2 size={16} />
+                      <FiEdit2 />
                     </button>
                     <button
-                      className="action-btn delete-btn"
+                      className="delete-btn"
                       onClick={() => onDelete(meal.id)}
-                      aria-label="Delete meal"
+                      aria-label="Delete"
                     >
-                      <FiTrash2 size={16} />
+                      <FiTrash2 />
                     </button>
                   </div>
                 </td>

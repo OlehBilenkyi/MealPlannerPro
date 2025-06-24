@@ -1,39 +1,76 @@
 import React from "react";
+import { FiFilter, FiCalendar, FiChevronDown, FiX } from "react-icons/fi";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import "./MealsFilter.css";
 
-export default function MealsFilter({ filters, onFilterChange, onClear }) {
+const MealFilters = ({ filters, onFilterChange, onClearFilters }) => {
+  const mealTypes = [
+    { value: "", label: "All Types" },
+    { value: "breakfast", label: "Breakfast" },
+    { value: "lunch", label: "Lunch" },
+    { value: "dinner", label: "Dinner" },
+    { value: "snack", label: "Snack" },
+  ];
+
   return (
-    <div className="filters">
-      <h4 className="filter-heading">Filters</h4>
+    <div className="filters-container">
+      <div className="filters-header">
+        <FiFilter className="filter-icon" />
+        <h3>Filter Meals</h3>
+        {filters.date || filters.type ? (
+          <button className="clear-btn" onClick={onClearFilters}>
+            <FiX /> Clear
+          </button>
+        ) : null}
+      </div>
 
-      <label className="form-label">
-        Meal Type:
-        <select
-          className="form-select"
-          value={filters.type}
-          onChange={(e) => onFilterChange("type", e.target.value)}
-        >
-          <option value="">All Types</option>
-          <option value="breakfast">Breakfast</option>
-          <option value="lunch">Lunch</option>
-          <option value="dinner">Dinner</option>
-          <option value="snack">Snack</option>
-        </select>
-      </label>
+      <div className="filter-group">
+        <label className="filter-label">
+          <span>Meal Type</span>
+          <div className="select-wrapper">
+            <select
+              value={filters.type}
+              onChange={(e) => onFilterChange("type", e.target.value)}
+              className="type-select"
+            >
+              {mealTypes.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </select>
+            <FiChevronDown className="select-arrow" />
+          </div>
+        </label>
+      </div>
 
-      <label className="form-label">
-        Date:
-        <input
-          className="form-input"
-          type="date"
-          value={filters.date}
-          onChange={(e) => onFilterChange("date", e.target.value)}
-        />
-      </label>
-
-      <button className="btn btn-primary" onClick={onClear}>
-        Clear Filters
-      </button>
+      <div className="filter-group">
+        <label className="filter-label">
+          <span>Date</span>
+          <div className="date-picker-wrapper">
+            <DatePicker
+              selected={filters.date ? new Date(filters.date) : null}
+              onChange={(date) =>
+                onFilterChange(
+                  "date",
+                  date ? date.toISOString().split("T")[0] : ""
+                )
+              }
+              dateFormat="MMMM d, yyyy"
+              placeholderText="Select date"
+              className="date-picker-input"
+              popperClassName="calendar-popper"
+              calendarClassName="theme-calendar"
+              isClearable
+              clearButtonClassName="date-clear-btn"
+            />
+            <FiCalendar className="calendar-icon" />
+          </div>
+        </label>
+      </div>
     </div>
   );
-}
+};
+
+export default MealFilters;
