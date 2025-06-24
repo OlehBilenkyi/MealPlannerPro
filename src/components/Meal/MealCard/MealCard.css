@@ -1,0 +1,222 @@
+:root {
+  --primary: #6c5ce7;
+  --primary-light: rgba(108, 92, 231, 0.1);
+  --primary-dark: #5649c0;
+  --danger: #ff7675;
+  --danger-light: rgba(255, 118, 117, 0.1);
+  --success: #00b894;
+  --warning: #fdcb6e;
+  --dark: #2d3436;
+  --gray: #636e72;
+  --light: #dfe6e9;
+  --lighter: #f5f6fa;
+  --white: #ffffff;
+  --radius: 16px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.meal-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.meal-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+
+.meal-type-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--primary-light);
+  border-radius: var(--radius-sm);
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.meal-icon {
+  font-size: 1rem;
+}
+
+.meal-date {
+  font-size: 0.85rem;
+  color: var(--gray);
+  text-align: right;
+}
+
+.calories-display {
+  margin: 1rem 0;
+}
+
+.calories-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--dark);
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.calories-unit {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--gray);
+}
+
+.calories-progress {
+  height: 6px;
+  background: var(--light);
+  border-radius: 3px;
+  margin-top: 0.75rem;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.food-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.food-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px dashed var(--light);
+}
+
+.food-name {
+  font-weight: 500;
+  color: var(--dark);
+  flex: 1;
+}
+
+.food-details {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.food-quantity {
+  color: var(--gray);
+  font-size: 0.85rem;
+}
+
+.food-calories {
+  font-size: 0.8rem;
+  background: var(--light);
+  padding: 0.25rem 0.5rem;
+  border-radius: 10px;
+  color: var(--dark);
+}
+
+.more-items {
+  font-size: 0.85rem;
+  color: var(--gray);
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: auto;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  font-size: 0.9rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.edit-btn {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.delete-btn {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.edit-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.delete-btn:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* Анимация при появлении */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .meal-card {
+    padding: 1.25rem;
+  }
+
+  .calories-value {
+    font-size: 1.75rem;
+  }
+
+  .food-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .food-details {
+    align-self: flex-end;
+  }
+}
