@@ -1,4 +1,5 @@
 import React from "react";
+import "./FoodItemInput.css";
 
 export default function FoodItemInput({
   index,

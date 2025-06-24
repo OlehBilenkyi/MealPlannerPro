@@ -1,0 +1,269 @@
+/* MealsTable.css */
+.meals-table-container {
+  background-color: var(--color-white);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  margin: 2rem 0;
+  transition: all 0.3s ease;
+}
+
+.meals-table-container:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.meals-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 800px;
+}
+
+.meals-table th {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.meals-table td {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  vertical-align: middle;
+}
+
+.meal-row {
+  transition: all 0.2s ease;
+  animation: fadeInRow 0.4s ease-out forwards;
+  animation-delay: var(--delay);
+  opacity: 0;
+}
+
+.meal-row:hover {
+  background-color: rgba(67, 97, 238, 0.03);
+  transform: translateX(4px);
+}
+
+@keyframes fadeInRow {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Column specific styles */
+.date-cell {
+  min-width: 120px;
+}
+
+.date-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.date-wrapper .day {
+  font-size: 0.75rem;
+  color: var(--color-gray);
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.date-wrapper .date {
+  font-weight: 500;
+  color: var(--color-dark);
+}
+
+.type-cell {
+  min-width: 100px;
+}
+
+.meal-type {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  background-color: rgba(67, 97, 238, 0.1);
+  color: var(--color-primary);
+}
+
+.meal-type.breakfast {
+  background-color: rgba(255, 193, 7, 0.15);
+  color: #ff9800;
+}
+
+.meal-type.lunch {
+  background-color: rgba(76, 175, 80, 0.15);
+  color: #4caf50;
+}
+
+.meal-type.dinner {
+  background-color: rgba(156, 39, 176, 0.15);
+  color: #9c27b0;
+}
+
+.meal-type.snack {
+  background-color: rgba(0, 188, 212, 0.15);
+  color: #00bcd4;
+}
+
+.calories-cell {
+  min-width: 100px;
+}
+
+.calories-badge {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.calories-badge .unit {
+  font-size: 0.75rem;
+  color: var(--color-gray);
+  margin-left: 0.25rem;
+}
+
+.foods-cell {
+  min-width: 200px;
+}
+
+.food-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.food-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.food-name {
+  font-weight: 500;
+  color: var(--color-dark);
+}
+
+.food-quantity {
+  color: var(--color-gray);
+  font-size: 0.8rem;
+}
+
+.food-calories {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--color-primary);
+  background-color: rgba(67, 97, 238, 0.1);
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+}
+
+.more-items {
+  font-size: 0.75rem;
+  color: var(--color-gray);
+  margin-top: 0.25rem;
+}
+
+.actions-cell {
+  min-width: 100px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+}
+
+.edit-btn {
+  color: var(--color-primary);
+  background-color: rgba(67, 97, 238, 0.1);
+}
+
+.edit-btn:hover {
+  background-color: rgba(67, 97, 238, 0.2);
+}
+
+.delete-btn {
+  color: var(--color-danger);
+  background-color: rgba(239, 35, 60, 0.1);
+}
+
+.delete-btn:hover {
+  background-color: rgba(239, 35, 60, 0.2);
+}
+
+/* Empty state */
+.empty-state {
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.empty-state-content {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.empty-icon {
+  color: rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  color: var(--color-dark);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.empty-state p {
+  color: var(--color-gray);
+  font-size: 0.95rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .meals-table-container {
+    border-radius: 12px;
+  }
+
+  .meals-table th,
+  .meals-table td {
+    padding: 0.75rem 1rem;
+  }
+
+  .action-btn {
+    width: 32px;
+    height: 32px;
+  }
+}

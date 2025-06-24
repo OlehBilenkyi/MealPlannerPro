@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { useMeals } from "../contexts/MealsContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { useMeals } from "../../contexts/MealsContext";
 import { Link } from "react-router-dom";
+import "./Dashboard.css";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -63,7 +64,7 @@ export default function Dashboard() {
   const recentMeals = sortedByDateDesc.slice(0, 3);
 
   return (
-    <div className="container">
+    <div className="container dashboard">
       <h2 className="heading">Hello, {user?.displayName || user?.email}!</h2>
 
       {/* Statistics */}
@@ -98,37 +99,24 @@ export default function Dashboard() {
       </div>
 
       {/* Recent Meals */}
-      <div className="recent-meals" style={{ marginTop: "1.5rem" }}>
+      <div className="recent-meals">
         <h3>Recent Meals</h3>
-        {recentMeals.length === 0 && <p>No meals added</p>}
-        <ul>
-          {recentMeals.map((meal) => (
-            <li
-              key={meal.id}
-              style={{
-                marginBottom: "0.5rem",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                backgroundColor: "var(--color-white)",
-                padding: "0.5rem 1rem",
-                borderRadius: "6px",
-                boxShadow: "var(--box-shadow)",
-              }}
-            >
-              <span>
-                {meal.date} — {meal.type} ({meal.totalCalories} kcal)
-              </span>
-              <Link
-                to="/meals"
-                className="btn btn-secondary"
-                style={{ fontSize: "0.85rem" }}
-              >
-                Go to
-              </Link>
-            </li>
-          ))}
-        </ul>
+        {recentMeals.length === 0 ? (
+          <div className="empty-state">No meals added</div>
+        ) : (
+          <ul>
+            {recentMeals.map((meal) => (
+              <li key={meal.id}>
+                <span>
+                  {meal.date} — {meal.type} ({meal.totalCalories} kcal)
+                </span>
+                <Link to="/meals" className="btn btn-secondary">
+                  View
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );

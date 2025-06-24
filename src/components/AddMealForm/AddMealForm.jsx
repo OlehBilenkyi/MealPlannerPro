@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { mealTypes } from "../services/mealService";
-import FoodItemInput from "./FoodItemInput";
+import { mealTypes } from "../../services/mealService";
+import FoodItemInput from "../FoodItemInput/FoodItemInput";
+import "./AddMealForm.css";
 
 const initialFoodItem = { name: "", calories: "", quantity: "" };
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
+import "./Auth.css";
 
 export default function Register() {
   const { register, error, loading } = useAuth();
@@ -19,13 +20,8 @@ export default function Register() {
 
   return (
     <div className="container">
-      <div
-        className="form-container"
-        style={{ maxWidth: "400px", margin: "0 auto" }}
-      >
-        <h2 className="heading" style={{ textAlign: "center" }}>
-          Register for Meal Planner Pro
-        </h2>
+      <div className="form-container">
+        <h2 className="heading">Register for Meal Planner Pro</h2>
         <form onSubmit={handleSubmit}>
           <label className="form-label">
             Email:
@@ -52,16 +48,12 @@ export default function Register() {
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? "Loading..." : "Register"}
           </button>
-          {error && (
-            <p style={{ color: "var(--color-danger)", marginTop: "0.5rem" }}>
-              {error}
-            </p>
-          )}
+          {error && <p className="error-message">{error}</p>}
         </form>
 
-        <p style={{ marginTop: "1rem", textAlign: "center" }}>
+        <p className="text-center mt-2">
           Already have an account?{" "}
-          <Link to="/login" style={{ color: "var(--color-primary)" }}>
+          <Link to="/login" className="link">
             Login
           </Link>
         </p>

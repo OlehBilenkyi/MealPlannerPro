@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import "./ActionBar.css";
 
 export default function ActionBar({ onClearFilters, onAddMeal }) {
   const navigate = useNavigate();

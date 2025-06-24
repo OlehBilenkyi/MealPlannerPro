@@ -1,4 +1,5 @@
 import React from "react";
+import "./MealsFilter.css";
 
 export default function MealsFilter({ filters, onFilterChange, onClear }) {
   return (

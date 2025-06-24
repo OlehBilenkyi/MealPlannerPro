@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { Navigate, Link } from "react-router-dom";
+import "./Auth.css";
 
 export default function Login() {
   const { user, login, error, loading } = useAuth();
@@ -16,13 +17,8 @@ export default function Login() {
 
   return (
     <div className="container">
-      <div
-        className="form-container"
-        style={{ maxWidth: "400px", margin: "0 auto", textAlign: "center" }}
-      >
-        <h2 className="heading" style={{ textAlign: "center" }}>
-          Login to Meal Planner Pro
-        </h2>
+      <div className="form-container">
+        <h2 className="heading">Login to Meal Planner Pro</h2>
         <form onSubmit={handleSubmit}>
           <label className="form-label">
             Email:
@@ -49,23 +45,19 @@ export default function Login() {
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? "Loading..." : "Login"}
           </button>
-          {error && (
-            <p style={{ color: "var(--color-danger)", marginTop: "0.5rem" }}>
-              {error}
-            </p>
-          )}
+          {error && <p className="error-message">{error}</p>}
         </form>
 
-        <p style={{ marginTop: "1rem" }}>
+        <p className="text-center mt-2">
           No account?{" "}
-          <Link to="/register" style={{ color: "var(--color-primary)" }}>
+          <Link to="/register" className="link">
             Register
           </Link>
         </p>
-        <p style={{ marginTop: "1rem" }}>
+        <p className="info-text text-center mt-1">
           To see the app in action, register with any email and any password.
         </p>
-        <p style={{ marginTop: "1rem" }}>
+        <p className="info-text text-center mt-1">
           Чтобы посмотреть работу приложения - зарегистрируйтесь с любым email и
           любым паролем.
         </p>

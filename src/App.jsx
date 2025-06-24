@@ -8,13 +8,13 @@ import {
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import PrivateRoute from "./routes/PrivateRoute";
-import Navbar from "./components/Navbar";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
-import Meals from "./pages/Meals";
-import Stats from "./pages/Stats";
-import Profile from "./pages/Profile";
+import Navbar from "./components/Navbar/Navbar";
+import Login from "./components/auth/Login";
+import Register from "./components/auth/Register";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import Meals from "./pages/Meals/Meals";
+import Stats from "./pages/Stats/Stats";
+import Profile from "./pages/Profile/Profile";
 
 /**
  * Основные маршруты приложения с приватными маршрутами
