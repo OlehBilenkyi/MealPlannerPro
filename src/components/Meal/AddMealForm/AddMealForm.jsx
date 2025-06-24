@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { mealTypes } from "../../services/mealService";
-import FoodItemInput from "../FoodItemInput/FoodItemInput";
+import { mealTypes } from "../../../services/mealService";
+import FoodItemInput from "../../FoodItemInput/FoodItemInput";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import "./AddMealForm.css";
 
 const initialFoodItem = { name: "", calories: "", quantity: "" };
@@ -124,22 +126,29 @@ export default function AddMealForm({ onAdd, meal, onUpdate }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div style={{ marginBottom: "1rem" }}>
+    <form onSubmit={handleSubmit} className="form">
+      <div className="form-group">
         <label className="form-label">
-          Date:
-          <input
+          <span>Date</span>
+          <DatePicker
+            selected={formState.date ? new Date(formState.date) : null}
+            onChange={(date) =>
+              setFormState((prev) => ({
+                ...prev,
+                date: date ? date.toISOString().split("T")[0] : "",
+              }))
+            }
+            dateFormat="MMMM d, yyyy"
             className="form-input"
-            type="date"
-            name="date"
-            value={formState.date}
-            onChange={handleInputChange}
+            placeholderText="Select date"
+            calendarClassName="theme-calendar"
+            popperClassName="calendar-popper"
           />
         </label>
         {errors.date && <div className="form-error">{errors.date}</div>}
 
         <label className="form-label">
-          Meal Type:
+          <span>Meal Type</span>
           <select
             className="form-select"
             name="type"
@@ -148,22 +157,14 @@ export default function AddMealForm({ onAdd, meal, onUpdate }) {
           >
             {mealTypes.map((t) => (
               <option key={t} value={t}>
-                {t}
+                {t.charAt(0).toUpperCase() + t.slice(1)}
               </option>
             ))}
           </select>
         </label>
       </div>
 
-      <div
-        style={{
-          backgroundColor: "#fff",
-          borderRadius: "8px",
-          padding: "1rem",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-          marginBottom: "1rem",
-        }}
-      >
+      <div className="food-items-container">
         {formState.foods.map((food, idx) => (
           <FoodItemInput
             key={idx}
@@ -177,7 +178,7 @@ export default function AddMealForm({ onAdd, meal, onUpdate }) {
         ))}
       </div>
 
-      <div style={{ display: "flex", gap: "0.5rem" }}>
+      <div className="buttons-container">
         <button type="button" className="btn btn-primary" onClick={addFoodItem}>
           + Add Food Item
         </button>

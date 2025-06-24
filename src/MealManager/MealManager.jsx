@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { addMeal, subscribeToUserMeals } from "../services/mealService";
-import AddMealForm from "../components/AddMealForm";
+import AddMealForm from "../components/Meal/AddMealForm";
 import { FiPlus, FiCalendar, FiClock } from "react-icons/fi";
 import "./MealManager.css";
 
